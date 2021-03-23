@@ -20,9 +20,9 @@ use serde::{ Serialize, Deserialize };
 /// use std::path::Path;
 /// 
 /// fn example() -> Result<Launchd, Error> {
-///     Ok(Launchd::new(String::from("LABEL"), Path::new("./foo/bar.txt"))?
-///         .with_user_name("Henk".to_owned())
-///         .with_program_arguments(vec!["Hello".to_owned(), "World!".to_owned()])
+///     Ok(Launchd::new("LABEL".to_string(), Path::new("./foo/bar.txt"))?
+///         .with_user_name("Henk".to_string())
+///         .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 ///         .with_start_calendar_intervals(vec![CalendarInterval::new().with_hour(12)?])
 ///         .disabled()
 ///         // etc...
@@ -40,6 +40,7 @@ use serde::{ Serialize, Deserialize };
 // TODO: remove owned Strings (?)
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
+#[derive(Debug, PartialEq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
@@ -91,7 +92,7 @@ pub struct Launchd {
 /// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
@@ -395,8 +396,25 @@ impl CalendarInterval {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn create_launchd() {
+        let check = Launchd {
+            label: "BLA".to_string(),
+            disabled: None,
+            user_name: None,
+            group_name: None,
+            program: "./henk.sh".to_string(),
+            program_arguments: None,
+            run_at_load: None,
+            watch_paths: None,
+            queue_directories: None,
+            start_on_mount: None,
+            start_interval: None,
+            start_calendar_intervals: None,
+        };
+        let test = Launchd::new("BLA".to_string(), "./henk.sh");
+        assert!(test.is_ok());
+        assert_eq!(test.unwrap(), check);
     }
 }
