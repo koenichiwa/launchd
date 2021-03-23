@@ -101,7 +101,6 @@ pub struct CalendarInterval {
     initialized: bool,
 }
 
-// TODO implement debug
 #[derive(Debug)]
 pub enum Error {
     CalendarIntervalError(CalendarIntervalField, u8),
