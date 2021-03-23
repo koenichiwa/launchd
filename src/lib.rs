@@ -1,10 +1,12 @@
 use std::path::Path;
+#[cfg(feature="cron")]
+use std::convert::TryInto;
 #[cfg(feature="serde")]
 use serde::Serialize;
 #[cfg(feature="xml")]
 use plist::{to_writer_xml, to_file_xml};
 #[cfg(feature="cron")]
-use cron::Schedule;
+use cron::{Schedule, TimeUnitSpec};
 
 /// Representation of a launchd.plist file.
 /// The definition of which can be found [here](https://www.manpagez.com/man/5/launchd.plist/).
@@ -19,6 +21,7 @@ use cron::Schedule;
 ///         ?.with_user_name("Henk".to_owned())
 ///         .with_program_arguments(vec!["Hello".to_owned(), "World!".to_owned()])
 ///         .with_start_calendar_intervals(vec![CalendarInterval::new().with_hour(12)?])
+///         .disabled()
 ///         // etc...
 ///     )
 /// }
@@ -71,12 +74,15 @@ pub struct Launchd {
 
 #[cfg_attr(feature = "serde", derive(Serialize))]
 #[cfg_attr(feature = "xml", serde(rename_all = "PascalCase"))]
+#[derive(Copy, Clone)]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
     day: Option<u8>,
     weekday: Option<u8>,
     month: Option<u8>,
+    #[serde(skip_serializing)]
+    initialized: bool,
 }
 
 // TODO implement debug
@@ -84,7 +90,7 @@ pub struct CalendarInterval {
 pub enum LaunchdError {
     CalendarIntervalError(CalendarIntervalField, u8),
     #[cfg(feature="cron")]
-    CronParseError,
+    CronParseError(CalendarIntervalField, u32), // TODO: Change u32 to cron::Ordinal when possible
     PathConversionError,
 }
 
@@ -221,6 +227,7 @@ impl Launchd {
 /// let calendarinterval = example();
 /// ```
 /// 
+
 impl CalendarInterval {
     pub fn new() -> Self {
         CalendarInterval {
@@ -229,57 +236,126 @@ impl CalendarInterval {
             day: None,
             weekday: None,
             month: None,
+            initialized: false
         }
     }
 
-    pub fn with_minute(mut self, minute: u8) -> Result<Self, LaunchdError> {
+    pub fn with_minute(self, minute: u8) -> Result<Self, LaunchdError> {
         return if minute > 60 {
             Err(LaunchdError::CalendarIntervalError(CalendarIntervalField::Minute, minute))
         } else {
-            self.minute = Some(minute);
-            Ok(self)
+            let mut result = self;
+            result.minute = Some(minute);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
-    pub fn with_hour(mut self, hour: u8) -> Result<Self, LaunchdError> {
+    pub fn with_hour(self, hour: u8) -> Result<Self, LaunchdError> {
         return if hour > 60 {
             Err(LaunchdError::CalendarIntervalError(CalendarIntervalField::Hour, hour))
         } else {
-            self.hour = Some(hour);
-            Ok(self)
+            let mut result = self;
+            result.hour = Some(hour);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
-    pub fn with_day(mut self, day: u8) -> Result<Self, LaunchdError> {
+    pub fn with_day(self, day: u8) -> Result<Self, LaunchdError> {
         return if day > 31 {
             Err(LaunchdError::CalendarIntervalError(CalendarIntervalField::Day, day))
         } else {
-            self.day = Some(day);
-            Ok(self)
+            let mut result = self;
+            result.day = Some(day);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
-    pub fn with_weekday(mut self, weekday: u8) -> Result<Self, LaunchdError> {
+    pub fn with_weekday(self, weekday: u8) -> Result<Self, LaunchdError> {
         return if weekday > 7 {
             Err(LaunchdError::CalendarIntervalError(CalendarIntervalField::Weekday, weekday))
         } else {
-            self.weekday = Some(weekday);
-            Ok(self)
+            let mut result = self;
+            result.weekday = Some(weekday);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
-    pub fn with_month(mut self, month: u8) -> Result<Self, LaunchdError> {
+    pub fn with_month(self, month: u8) -> Result<Self, LaunchdError> {
         return if month > 12 {
             Err(LaunchdError::CalendarIntervalError(CalendarIntervalField::Month, month))
         } else {
-            self.month = Some(month);
-            Ok(self)
+            let mut result = self;
+            result.month = Some(month);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
     #[cfg(feature="cron")]
     pub fn from_cron_schedule(schedule: Schedule) -> Result<Vec<Self>, LaunchdError> {
-        todo!()
+        let mut result_vec = Vec::new();
+        for month in schedule.months().iter() {
+            for weekday in schedule.days_of_week().iter() {
+                for day in schedule.days_of_month().iter() {
+                    for hour in schedule.hours().iter() {
+                        for minute in schedule.minutes().iter() {
+
+                            let result = Self::new();
+
+                            // TODO: clean this mess up (thiserror + anyhow ?)
+                            if !schedule.months().is_all() { 
+                                result.with_month(
+                                    month.try_into().map_err(|_| 
+                                        LaunchdError::CronParseError(CalendarIntervalField::Month, month) 
+                                    )?
+                                )?; 
+                            }
+                            if !schedule.days_of_week().is_all() { 
+                                result.with_weekday(
+                                    weekday.try_into().map_err(|_| 
+                                        LaunchdError::CronParseError(CalendarIntervalField::Weekday, weekday) 
+                                    )?
+                                )?; 
+                            }
+                            if !schedule.days_of_month().is_all() { 
+                                result.with_day(
+                                    day.try_into().map_err(|_| 
+                                        LaunchdError::CronParseError(CalendarIntervalField::Day, day) 
+                                    )?
+                                )?; 
+                            }
+                            if !schedule.hours().is_all() { 
+                                result.with_hour(
+                                    hour.try_into().map_err(|_| 
+                                        LaunchdError::CronParseError(CalendarIntervalField::Hour, hour) 
+                                    )?
+                                )?; 
+                            }
+                            if !schedule.minutes().is_all() { 
+                                result.with_minute(
+                                    minute.try_into().map_err(|_| 
+                                        LaunchdError::CronParseError(CalendarIntervalField::Minute, minute) 
+                                    )?
+                                )?; 
+                            }
+
+                            if result.initialized { result_vec.push(result); }
+
+                            if schedule.minutes().is_all() { break;}
+                        }
+                        if schedule.hours().is_all() { break; }
+                    }
+                    if schedule.days_of_month().is_all() { break; }
+                }
+                if schedule.days_of_week().is_all() {break;}
+            }
+            if schedule.months().is_all() { break; }
+        }
+        Ok(result_vec)
     }
 }
 
