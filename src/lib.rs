@@ -92,7 +92,7 @@ pub struct Launchd {
 /// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
@@ -132,7 +132,7 @@ impl Launchd {
             .ok_or(Error::PathConversionError)?
             .to_owned();
         Ok(Launchd {
-            label: label,
+            label,
             disabled: None,
             user_name: None,
             group_name: None,
@@ -276,7 +276,7 @@ impl CalendarInterval {
     }
 
     pub fn with_minute(self, minute: u8) -> Result<Self, Error> {
-        return if minute > 60 {
+        if minute > 60 {
             Err(Error::CalendarIntervalError(CalendarIntervalField::Minute, minute))
         } else {
             let mut result = self;
@@ -287,7 +287,7 @@ impl CalendarInterval {
     }
 
     pub fn with_hour(self, hour: u8) -> Result<Self, Error> {
-        return if hour > 60 {
+        if hour > 60 {
             Err(Error::CalendarIntervalError(CalendarIntervalField::Hour, hour))
         } else {
             let mut result = self;
@@ -298,7 +298,7 @@ impl CalendarInterval {
     }
 
     pub fn with_day(self, day: u8) -> Result<Self, Error> {
-        return if day > 31 {
+        if day > 31 {
             Err(Error::CalendarIntervalError(CalendarIntervalField::Day, day))
         } else {
             let mut result = self;
@@ -309,7 +309,7 @@ impl CalendarInterval {
     }
 
     pub fn with_weekday(self, weekday: u8) -> Result<Self, Error> {
-        return if weekday > 7 {
+        if weekday > 7 {
             Err(Error::CalendarIntervalError(CalendarIntervalField::Weekday, weekday))
         } else {
             let mut result = self;
@@ -320,7 +320,7 @@ impl CalendarInterval {
     }
 
     pub fn with_month(self, month: u8) -> Result<Self, Error> {
-        return if month > 12 {
+        if month > 12 {
             Err(Error::CalendarIntervalError(CalendarIntervalField::Month, month))
         } else {
             let mut result = self;
