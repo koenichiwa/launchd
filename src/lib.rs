@@ -1,5 +1,8 @@
 use std::path::Path;
+#[cfg(feature="serde")]
 use serde::Serialize;
+#[cfg(feature="xml")]
+use plist::{to_writer_xml, to_file_xml};
 
 /// Representation of a launchd.plist file.
 /// The definition of which can be found [here](https://www.manpagez.com/man/5/launchd.plist/).
@@ -27,8 +30,8 @@ use serde::Serialize;
 /// NB: The usage is still subject to change.
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
 // TODO: remove owning Strings
-#[derive(Serialize)]
-#[serde(rename_all = "PascalCase")]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[cfg_attr(feature = "xml", serde(rename_all = "PascalCase"))]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
@@ -64,8 +67,8 @@ pub struct Launchd {
     // ...
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "PascalCase")]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[cfg_attr(feature = "xml", serde(rename_all = "PascalCase"))]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
@@ -185,6 +188,17 @@ impl Launchd {
     pub fn with_start_calendar_intervals(mut self, start_calendar_intervals: Vec<CalendarInterval>) -> Self {
         self.start_calendar_intervals = Some(start_calendar_intervals);
         self
+    }
+
+    // Write --
+    #[cfg(feature="xml")]
+    pub fn to_writer_xml<W: std::io::Write>(&self, writer: W) -> Result<(), plist::Error>{
+        to_writer_xml(writer, self)
+    }
+
+    #[cfg(feature="xml")]
+    pub fn to_file_xml<P: AsRef<Path>>(&self, file: P) -> Result<(), plist::Error>{
+        to_file_xml(file, self)
     }
 }
 
