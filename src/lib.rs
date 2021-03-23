@@ -3,6 +3,8 @@ use std::path::Path;
 use serde::Serialize;
 #[cfg(feature="xml")]
 use plist::{to_writer_xml, to_file_xml};
+#[cfg(feature="cron")]
+use cron::Schedule;
 
 /// Representation of a launchd.plist file.
 /// The definition of which can be found [here](https://www.manpagez.com/man/5/launchd.plist/).
@@ -81,6 +83,8 @@ pub struct CalendarInterval {
 #[derive(Debug)]
 pub enum LaunchdError {
     CalendarIntervalError(CalendarIntervalField, u8),
+    #[cfg(feature="cron")]
+    CronParseError,
     PathConversionError,
 }
 
@@ -271,6 +275,11 @@ impl CalendarInterval {
             self.month = Some(month);
             Ok(self)
         }
+    }
+
+    #[cfg(feature="cron")]
+    pub fn from_cron_schedule(schedule: Schedule) -> Result<Vec<Self>, LaunchdError> {
+        todo!()
     }
 }
 
