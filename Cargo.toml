@@ -1,8 +1,14 @@
 [package]
 name = "launchd"
 version = "0.1.0"
-authors = ["Koenichiwa <koenvwel@gmail.com>"]
+authors = ["Koen van Wel <koenvwel@gmail.com>"]
 edition = "2018"
+repository = "https://github.com/koenichiwa/launchd"
+readme = "README.md"
+description = "Rust library for creating and parsing launchd files"
+keywords = ["launchd", "schedule", "repeat", "periodic", "macOS"]
+license = "MIT"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,4 +21,4 @@ io =["serde", "plist"]
 serde = { version = "1.0", features = ["derive"], optional = true }
 plist = { version = "1", optional = true }
 cron = { version = "0.9", optional = true }
-thiserror = "1.0.24"
+thiserror = "1.0"
