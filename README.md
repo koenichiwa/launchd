@@ -1,8 +1,8 @@
-#launchd
+# launchd
 A Rust library for creating and parsing Launchd files.
 It's still in early development all help is welcome.
 
-##Example
+## Example
 
 ``` rust
 use std::path::Path;
