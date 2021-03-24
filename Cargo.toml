@@ -9,6 +9,9 @@ description = "Rust library for creating and parsing launchd files"
 keywords = ["launchd", "schedule", "repeat", "periodic", "macOS"]
 license = "MIT"
 
+[package.metadata.cargo-all-features]
+skip_optional_dependencies = true
+extra_features = ["cron",]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -10,8 +10,8 @@ pub enum Error {
     PathConversion,
 
     #[cfg(feature = "cron")]
-    #[error("The crontab generated an invalid value for {0:?}: {1}")]
-    InvalidCronField(CalendarIntervalField, u32), // TODO: Change u32 to cron::Ordinal when possible. See: https://github.com/zslayton/cron/issues/82
+    #[error("The crontab generated an invalid value: {0}")]
+    InvalidCronField(u32), // TODO: Change u32 to cron::Ordinal when possible. See: https://github.com/zslayton/cron/issues/82
 
     #[cfg(feature = "io")]
     #[error(transparent)]

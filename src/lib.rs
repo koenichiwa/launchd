@@ -6,6 +6,8 @@
 //! ``` rust
 //! use std::path::Path;
 //! use launchd::{CalendarInterval, Error, Launchd};
+//! 
+//! 
 //! fn main() -> Result<(), Error> {
 //!     let ci = CalendarInterval::default()
 //!         .with_hour(12)?
@@ -17,8 +19,12 @@
 //!             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 //!             .with_start_calendar_intervals(vec![ci])
 //!             .disabled();
+//! 
+//!     #[cfg(feature="io")] // Default
+//!     return launchd.to_writer_xml(std::io::stdout());
 //!     
-//!     launchd.to_writer_xml(std::io::stdout())
+//!     #[cfg(not(feature="io"))]
+//!     return Ok(());
 //! }
 //! ```
 //!
@@ -161,7 +167,7 @@ pub struct CalendarInterval {
     day: Option<u8>,
     weekday: Option<u8>,
     month: Option<u8>,
-    #[serde(skip_serializing)]
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     initialized: bool,
 }
 
@@ -376,27 +382,27 @@ impl CalendarInterval {
                             // TODO: clean this mess up (thiserror + anyhow ?)
                             if !schedule.months().is_all() {
                                 result.with_month(month.try_into().map_err(|_| {
-                                    Error::InvalidCronField(CalendarIntervalField::Month, month)
+                                    Error::InvalidCronField(month)
                                 })?)?;
                             }
                             if !schedule.days_of_week().is_all() {
                                 result.with_weekday(weekday.try_into().map_err(|_| {
-                                    Error::InvalidCronField(CalendarIntervalField::Weekday, weekday)
+                                    Error::InvalidCronField(weekday)
                                 })?)?;
                             }
                             if !schedule.days_of_month().is_all() {
                                 result.with_day(day.try_into().map_err(|_| {
-                                    Error::InvalidCronField(CalendarIntervalField::Day, day)
+                                    Error::InvalidCronField(day)
                                 })?)?;
                             }
                             if !schedule.hours().is_all() {
                                 result.with_hour(hour.try_into().map_err(|_| {
-                                    Error::InvalidCronField(CalendarIntervalField::Hour, hour)
+                                    Error::InvalidCronField(hour)
                                 })?)?;
                             }
                             if !schedule.minutes().is_all() {
                                 result.with_minute(minute.try_into().map_err(|_| {
-                                    Error::InvalidCronField(CalendarIntervalField::Minute, minute)
+                                    Error::InvalidCronField(minute)
                                 })?)?;
                             }
 
