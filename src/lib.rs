@@ -6,8 +6,8 @@
 //! ``` rust
 //! use std::path::Path;
 //! use launchd::{CalendarInterval, Error, Launchd};
-//! 
-//! 
+//!
+//!
 //! fn main() -> Result<(), Error> {
 //!     let ci = CalendarInterval::default()
 //!         .with_hour(12)?
@@ -19,7 +19,7 @@
 //!             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 //!             .with_start_calendar_intervals(vec![ci])
 //!             .disabled();
-//! 
+//!
 //!     #[cfg(feature="io")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
 //!     
@@ -381,29 +381,35 @@ impl CalendarInterval {
 
                             // TODO: clean this mess up (thiserror + anyhow ?)
                             if !schedule.months().is_all() {
-                                result.with_month(month.try_into().map_err(|_| {
-                                    Error::InvalidCronField(month)
-                                })?)?;
+                                result.with_month(
+                                    month
+                                        .try_into()
+                                        .map_err(|_| Error::InvalidCronField(month))?,
+                                )?;
                             }
                             if !schedule.days_of_week().is_all() {
-                                result.with_weekday(weekday.try_into().map_err(|_| {
-                                    Error::InvalidCronField(weekday)
-                                })?)?;
+                                result.with_weekday(
+                                    weekday
+                                        .try_into()
+                                        .map_err(|_| Error::InvalidCronField(weekday))?,
+                                )?;
                             }
                             if !schedule.days_of_month().is_all() {
-                                result.with_day(day.try_into().map_err(|_| {
-                                    Error::InvalidCronField(day)
-                                })?)?;
+                                result.with_day(
+                                    day.try_into().map_err(|_| Error::InvalidCronField(day))?,
+                                )?;
                             }
                             if !schedule.hours().is_all() {
-                                result.with_hour(hour.try_into().map_err(|_| {
-                                    Error::InvalidCronField(hour)
-                                })?)?;
+                                result.with_hour(
+                                    hour.try_into().map_err(|_| Error::InvalidCronField(hour))?,
+                                )?;
                             }
                             if !schedule.minutes().is_all() {
-                                result.with_minute(minute.try_into().map_err(|_| {
-                                    Error::InvalidCronField(minute)
-                                })?)?;
+                                result.with_minute(
+                                    minute
+                                        .try_into()
+                                        .map_err(|_| Error::InvalidCronField(minute))?,
+                                )?;
                             }
 
                             if result.initialized {
