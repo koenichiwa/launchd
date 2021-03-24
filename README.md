@@ -6,19 +6,19 @@ It's still in early development all help is welcome.
 
 ``` rust
 use std::path::Path;
-use launchd::{CalendarInterval, Error, Launchd}
+use launchd::{CalendarInterval, Error, Launchd};
 fn main() -> Result<(), Error> {
-    let ci = CalendarInterval::new()
+    let ci = CalendarInterval::default()
         .with_hour(12)?
         .with_minute(10)?
         .with_weekday(7)?;
 
-    let launchd = Launchd::new("LABEL".to_string(), Path::new("./foo/bar.txt"))?
-            .with_user_name("Henk".to_string())
+    let launchd = Launchd::new("LABEL", Path::new("./foo/bar.txt"))?
+            .with_user_name("Henk")
             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
             .with_start_calendar_intervals(vec![ci])
             .disabled();
-
+    
     launchd.to_writer_xml(std::io::stdout())
 }
 ```
