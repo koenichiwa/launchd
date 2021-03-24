@@ -61,8 +61,8 @@
 use cron::{Schedule, TimeUnitSpec};
 #[cfg(feature = "io")]
 use plist::{
-    from_bytes, from_file, from_reader, from_reader_xml, 
-    to_file_binary, to_file_xml, to_writer_binary, to_writer_xml,
+    from_bytes, from_file, from_reader, from_reader_xml, to_file_binary, to_file_xml,
+    to_writer_binary, to_writer_xml,
 };
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
