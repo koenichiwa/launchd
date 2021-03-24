@@ -1,0 +1,22 @@
+use std::ops::RangeInclusive;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("CalendarField field with value: {1} should lie in inclusive range: {0:?}")]
+    CalendarFieldOutOfBounds(RangeInclusive<u8>, u8),
+    #[error("The path could not be parsed")]
+    // TODO: Show path. Is this really needed (invalid paths are not rejected)
+    PathConversion,
+
+    #[cfg(feature = "cron")]
+    #[error("The crontab generated an invalid value for {0:?}: {1}")]
+    InvalidCronField(CalendarIntervalField, u32), // TODO: Change u32 to cron::Ordinal when possible. See: https://github.com/zslayton/cron/issues/82
+
+    #[cfg(feature = "io")]
+    #[error(transparent)]
+    Read(plist::Error),
+    #[cfg(feature = "io")]
+    #[error(transparent)]
+    Write(plist::Error),
+}
