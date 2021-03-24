@@ -15,13 +15,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Fmt
-      run: cargo fmt --all -- --check
+      run: cargo fmt --all --verbose -- --check
     - name: Clippy
-      run: cargo clippy -- -D warnings
+      run: cargo clippy --verbose -- -D warnings
 
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose
     - name: Run tests
