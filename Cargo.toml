@@ -10,14 +10,12 @@ keywords = ["launchd", "schedule", "repeat", "periodic", "macOS"]
 license = "MIT"
 
 [package.metadata.cargo-all-features]
-skip_optional_dependencies = true
-extra_features = ["cron",]
+skip_feature_sets = [["io", "serde"], ["io", "plist"]]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
 default = ["io"]
-
 io =["serde", "plist"]
 
 [dependencies]

@@ -1,5 +1,6 @@
 //! A Rust library for creating and parsing Launchd files.
-//! It's still in early development, all help is welcome.
+//! 
+//! It's still in early development and all help is welcome.
 //!
 //! ## Example
 //!
@@ -15,7 +16,7 @@
 //!         .with_weekday(7)?;
 //!
 //!     let launchd = Launchd::new("LABEL", Path::new("./foo/bar.txt"))?
-//!             .with_user_name("Henk".to_string())
+//!             .with_user_name("Henk")
 //!             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 //!             .with_start_calendar_intervals(vec![ci])
 //!             .disabled();
