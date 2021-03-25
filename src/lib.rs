@@ -1,5 +1,5 @@
 //! A Rust library for creating and parsing Launchd files.
-//! 
+//!
 //! It's still in early development and all help is welcome.
 //!
 //! ## Example
