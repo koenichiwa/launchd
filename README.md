@@ -1,7 +1,37 @@
 # launchd
 A Rust library for creating and parsing Launchd files.
-
 It's still in early development and all help is welcome.
+
+## FAQ
+### What is Launchd?
+Launchd is MacOS's way of scheduling programs and services to be ran.
+For more information: [Wiki](https://en.wikipedia.org/wiki/Launchd)
+For a more detailed description of the parameters run `man launchd.plist` on your Apple computer or check out: [manpagez](https://www.manpagez.com/man/5/launchd.plist/)
+
+### Why not cron?
+MacOS deprecated cron, the previous way of scheduling programs.
+This library also provides a way of parsing crontabs to CalendarIntervals when the `cron` feature is selected.
+Disclaimer: this feature is still untested.
+
+### Why not systemd?
+Due to licensing features MacOS does not support systemd. 
+The parsing of these files is not included in this library.
+
+## Usage
+
+Add this to your Cargo.toml dependencies:
+``` toml
+launchd = "0.1.0"
+```
+Or if you want to translate crontabs:
+``` toml
+launchd = {version = "0.1.0", features=["cron"]}
+```
+Or if you don't want the plist writer:
+``` toml
+launchd = {version = "0.1.0", default-features = false, features=["serde"]}
+```
+
 
 ## Example
 

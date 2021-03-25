@@ -24,7 +24,7 @@
 //!     #[cfg(feature="io")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
 //!     
-//!     #[cfg(not(feature="io"))]
+//!     #[cfg(not(feature="io"))] // If you don't want to build any dependencies (except from thiserror)
 //!     return Ok(());
 //! }
 //! ```
