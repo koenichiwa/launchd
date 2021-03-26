@@ -27,11 +27,17 @@ Add this to your Cargo.toml dependencies:
 ``` toml
 launchd = "0.1.0"
 ```
-Or if you want to translate crontabs:
+
+## Features
+### Default
+``` toml
+launchd = {version = "0.1.0", features=["io"]}
+```
+### Translate crontabs
 ``` toml
 launchd = {version = "0.1.0", features=["cron"]}
 ```
-Or if you don't want the plist writer:
+### Without the plist writer
 ``` toml
 launchd = {version = "0.1.0", default-features = false, features=["serde"]}
 ```
