@@ -5,9 +5,7 @@
 //! ## Example
 //!
 //! ``` rust
-//! use std::path::Path;
 //! use launchd::{CalendarInterval, Error, Launchd};
-//!
 //!
 //! fn main() -> Result<(), Error> {
 //!     let ci = CalendarInterval::default()
@@ -15,7 +13,7 @@
 //!         .with_minute(10)?
 //!         .with_weekday(7)?;
 //!
-//!     let launchd = Launchd::new("LABEL", Path::new("./foo/bar.txt"))?
+//!     let launchd = Launchd::new("LABEL", "./foo/bar.txt")?
 //!             .with_user_name("Henk")
 //!             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 //!             .with_start_calendar_intervals(vec![ci])
@@ -24,7 +22,7 @@
 //!     #[cfg(feature="io")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
 //!     
-//!     #[cfg(not(feature="io"))] // If you don't want to build any dependencies (except from thiserror)
+//!     #[cfg(not(feature="io"))] // If you don't want to build any optional dependencies
 //!     return Ok(());
 //! }
 //! ```
@@ -154,21 +152,21 @@ pub struct Launchd {
 /// fn example() -> Result<(), Error> {
 ///     let calendarinterval = CalendarInterval::default()
 ///             .with_hour(12)?
-///             .with_minute(60)?
+///             .with_minute(0)?
 ///             .with_weekday(7);
 ///     Ok(())
 /// }
 /// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
     day: Option<u8>,
     weekday: Option<u8>,
     month: Option<u8>,
-    #[cfg_attr(feature = "serde", serde(skip_serializing))]
+    #[cfg_attr(feature = "serde", serde(skip_serializing, default))]
     initialized: bool,
 }
 
