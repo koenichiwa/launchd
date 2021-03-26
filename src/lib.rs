@@ -458,7 +458,7 @@ mod tests {
             start_interval: None,
             start_calendar_intervals: None,
         };
-        let test = Launchd::new("Label".to_string(), "./henk.sh");
+        let test = Launchd::new("Label", "./henk.sh");
         assert!(test.is_ok());
         assert_eq!(test.unwrap(), check);
     }
@@ -477,12 +477,23 @@ mod tests {
         let test = CalendarInterval::default()
             .with_day(5)
             .and_then(|ci| ci.with_minute(5))
-            .and_then(|ci| ci.with_day(5))
             .and_then(|ci| ci.with_hour(5))
             .and_then(|ci| ci.with_weekday(5))
             .and_then(|ci| ci.with_month(5));
 
         assert!(test.is_ok());
         assert_eq!(test.unwrap(), check);
+    }
+
+    #[test]
+    fn create_invalid_calendar_interval() {
+        let test = CalendarInterval::default()
+            .with_day(32)
+            .and_then(|ci| ci.with_minute(5))
+            .and_then(|ci| ci.with_hour(5))
+            .and_then(|ci| ci.with_weekday(5))
+            .and_then(|ci| ci.with_month(5));
+        assert!(test.is_err());
+        eprintln!("{}", test.unwrap_err());
     }
 }
