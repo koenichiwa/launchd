@@ -108,7 +108,7 @@ use std::path::Path;
 // TODO: remove owned Strings (?)
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
@@ -233,14 +233,13 @@ impl Launchd {
         self
     }
 
-    pub fn run_at_load(mut self) -> Self {
-        self.run_at_load = Some(true);
-        self
-    }
-
     pub fn with_run_at_load(mut self, run_at_load: bool) -> Self {
         self.run_at_load = Some(run_at_load);
         self
+    }
+
+    pub fn run_at_load(self) -> Self {
+        self.with_run_at_load(true)
     }
 
     pub fn with_queue_directories(mut self, queue_directories: Vec<String>) -> Self {
@@ -314,13 +313,14 @@ impl Launchd {
 }
 
 impl CalendarInterval {
-    pub fn with_minute(mut self, minute: u8) -> Result<Self, Error> {
+    pub fn with_minute(self, minute: u8) -> Result<Self, Error> {
         if minute > 59 {
             Err(Error::CalendarFieldOutOfBounds(0..=59, minute))
         } else {
-            self.minute = Some(minute);
-            self.initialized = true;
-            Ok(self)
+            let mut result = self;
+            result.minute = Some(minute);
+            result.initialized = true;
+            Ok(result)
         }
     }
 
