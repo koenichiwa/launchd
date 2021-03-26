@@ -1,7 +1,17 @@
 # launchd
 A Rust library for creating and parsing Launchd files.
 
+## Disclaimers
 It's still in early development and all help is welcome.
+
+The syntax for building launchd files is still subject for change. 
+Launchd has a lot of properties, and I'm considering using [derive_builder](https://docs.rs/derive_builder/0.9.0/derive_builder/) or something similar to reduce boilerplate code, and increase maintainability. I'm hoping to have made that decision by `v0.3.0`. Suggestions are welcome!
+
+The Launchd struct is not yet complete. The fields are not public by design, so I can add (but not delete) fields through patches, without the need to create a new minor version.
+
+This library is largely untested. This is not a huge issue for the majority of the program. The only real issue is with the `cron` feature.
+
+I'm still thinking about what should happen if uninitialized `CalendarInterval`s are added to the struct. Should an exception be thrown, should they silently be filtered out, or should I leave that responsibility to the user.
 
 ## FAQ
 ### What is Launchd?
@@ -22,7 +32,6 @@ Due to licensing issues MacOS does not support systemd.
 The parsing of systemd is not included in this library.
 
 ## Usage
-
 Add this to your Cargo.toml dependencies:
 ``` toml
 launchd = "0.1.0"
@@ -41,7 +50,6 @@ launchd = {version = "0.1.0", features=["cron"]}
 ``` toml
 launchd = {version = "0.1.0", default-features = false, features=["serde"]}
 ```
-
 
 ## Example
 
