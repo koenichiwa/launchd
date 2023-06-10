@@ -21,7 +21,7 @@
 //!
 //!     #[cfg(feature="io")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
-//!     
+//!
 //!     #[cfg(not(feature="io"))] // If you don't want to build any optional dependencies
 //!     return Ok(());
 //! }
@@ -63,8 +63,17 @@
 //! ```
 
 mod error;
+pub mod keep_alive;
+pub mod mach_services;
+pub mod resource_limits;
+pub mod sockets;
 
 pub use self::error::Error;
+pub use self::keep_alive::{KeepAliveOptions, KeepAliveType};
+pub use self::mach_services::MachServiceEntry;
+pub use self::resource_limits::ResourceLimits;
+pub use self::sockets::{BonjourTypes, Socket, SocketOptions, Sockets};
+
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
 #[cfg(feature = "io")]
@@ -73,6 +82,7 @@ use plist::{from_bytes, from_file, from_reader, from_reader_xml};
 use plist::{to_file_binary, to_file_xml, to_writer_binary, to_writer_xml};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 #[cfg(feature = "cron")]
 use std::convert::TryInto;
 #[cfg(feature = "io")]
@@ -98,7 +108,7 @@ use std::path::Path;
 /// }
 ///
 /// let launchd = example();
-///     
+///
 /// ```
 /// This will create a launchd representation with the label "LABEL", running "./foo/bar.txt"
 /// with the args "Hello" and "World!", for the user "Henk", each day at 12.
@@ -108,40 +118,60 @@ use std::path::Path;
 // TODO: remove owned Strings (?)
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
     user_name: Option<String>,
     group_name: Option<String>,
-    // inetdCompatibility: Option<(?)>,
-    // LimitLoadToHosts: Option<Vec<String>>,
-    // LimitLoadFromHosts: Option<Vec<String>>,
-    // LimitLoadToSessionType: Option<String>,
+    limit_load_to_hosts: Option<Vec<String>>,
+    limit_load_from_hosts: Option<Vec<String>>,
+    limit_load_to_session_type: Option<String>,
     program: String,
     program_arguments: Option<Vec<String>>,
-    // EnableGlobbing: Option<bool>,
-    // EnableTransactions: Option<bool>,
+    enable_globbing: Option<bool>,
+    enable_transactions: Option<bool>,
     // OnDemand: Option<bool>, NB: deprecated (see KeepAlive)
-    // KeepAlive: Option<(?)>,
     run_at_load: Option<bool>,
-    // RootDirectory: Option<String>, NB: from path
-    // WorkingDirectory: Option<String>, NB: from path
-    // EnvironmentVariables: Option<String>
-    // Unmask: Option<u32> NB: check mode_t size in <sys/types.h>
-    // TimeOut: Option<u32>
-    // ExitTimeOut: Option<u32>
-    // ThrottleInterval: Option<u32>
-    // InitGroups: Option<bool>
+    root_directory: Option<String>,
+    working_directory: Option<String>,
+    environment_variables: Option<HashMap<String, String>>,
+    umask: Option<u16>, // NB: Defined as: typedef __uint16_t __darwin_mode_t;
+    time_out: Option<u32>,
+    exit_time_out: Option<u32>,
+    throttle_interval: Option<u32>,
+    init_groups: Option<bool>,
     watch_paths: Option<Vec<String>>,
     queue_directories: Option<Vec<String>>,
     start_on_mount: Option<bool>,
     start_interval: Option<u32>,
     start_calendar_intervals: Option<Vec<CalendarInterval>>,
-    // StandardInPath: Option<String> NB: from path
-    // StandardOutPath: Option<String> NB: from path
-    // StandardErrorPath: Option<String> NB: from path
-    // ...
+    standard_in_path: Option<String>,
+    standard_out_path: Option<String>,
+    standard_error_path: Option<String>,
+    #[serde(rename = "inetdCompatibility")]
+    inetd_compatibility: Option<HashMap<String, bool>>,
+    keep_alive: Option<KeepAliveType>,
+    process_type: Option<ProcessType>,
+    sockets: Option<Sockets>,
+    abandon_process_group: Option<bool>,
+    nice: Option<i32>,
+    launch_only_once: Option<bool>,
+    debug: Option<bool>,
+    wait_for_debugger: Option<bool>,
+    #[serde(rename = "LowPriorityIO")]
+    low_priority_io: Option<bool>,
+    mach_services: Option<HashMap<String, MachServiceEntry>>,
+    soft_resource_limits: Option<ResourceLimits>,
+    hard_resource_limits: Option<ResourceLimits>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub enum ProcessType {
+    Background,
+    Standard,
+    Adaptive,
+    Interactive,
 }
 
 /// Representation of a CalendarInterval
@@ -189,6 +219,35 @@ impl Launchd {
             start_on_mount: None,
             start_interval: None,
             start_calendar_intervals: None,
+            abandon_process_group: None,
+            debug: None,
+            enable_globbing: None,
+            enable_transactions: None,
+            environment_variables: None,
+            exit_time_out: None,
+            inetd_compatibility: None,
+            init_groups: None,
+            hard_resource_limits: None,
+            keep_alive: None,
+            launch_only_once: None,
+            limit_load_from_hosts: None,
+            limit_load_to_hosts: None,
+            limit_load_to_session_type: None,
+            low_priority_io: None,
+            mach_services: None,
+            nice: None,
+            process_type: None,
+            root_directory: None,
+            soft_resource_limits: None,
+            sockets: None,
+            standard_error_path: None,
+            standard_in_path: None,
+            standard_out_path: None,
+            throttle_interval: None,
+            time_out: None,
+            umask: None,
+            wait_for_debugger: None,
+            working_directory: None,
         })
     }
 
@@ -269,6 +328,228 @@ impl Launchd {
         start_calendar_intervals: Vec<CalendarInterval>,
     ) -> Self {
         self.start_calendar_intervals = Some(start_calendar_intervals);
+        self
+    }
+
+    pub fn with_abandon_process_group(mut self, value: bool) -> Self {
+        self.abandon_process_group = Some(value);
+        self
+    }
+
+    pub fn abandon_process_group(self) -> Self {
+        self.with_abandon_process_group(true)
+    }
+
+    pub fn with_debug(mut self, value: bool) -> Self {
+        self.debug = Some(value);
+        self
+    }
+
+    pub fn debug(self) -> Self {
+        self.with_debug(true)
+    }
+
+    pub fn with_enable_globbing(mut self, value: bool) -> Self {
+        self.enable_globbing = Some(value);
+        self
+    }
+
+    pub fn enable_globbing(self) -> Self {
+        self.with_enable_globbing(true)
+    }
+
+    pub fn with_enable_transactions(mut self, value: bool) -> Self {
+        self.enable_transactions = Some(value);
+        self
+    }
+
+    pub fn enable_transactions(self) -> Self {
+        self.with_enable_transactions(true)
+    }
+
+    pub fn with_environment_variables(mut self, env: HashMap<String, String>) -> Self {
+        self.environment_variables = Some(env);
+        self
+    }
+
+    pub fn with_exit_timeout(mut self, timeout: u32) -> Self {
+        self.exit_time_out = Some(timeout);
+        self
+    }
+
+    pub fn with_init_groups(mut self, value: bool) -> Self {
+        self.init_groups = Some(value);
+        self
+    }
+
+    pub fn init_groups(self) -> Self {
+        self.with_init_groups(true)
+    }
+
+    pub fn with_launch_only_once(mut self, value: bool) -> Self {
+        self.launch_only_once = Some(value);
+        self
+    }
+
+    pub fn launch_only_once(self) -> Self {
+        self.with_launch_only_once(true)
+    }
+
+    pub fn with_limit_load_from_hosts(mut self, value: Vec<String>) -> Self {
+        self.limit_load_from_hosts = Some(value);
+        self
+    }
+
+    pub fn with_limit_to_from_hosts(mut self, value: Vec<String>) -> Self {
+        self.limit_load_to_hosts = Some(value);
+        self
+    }
+
+    pub fn with_limit_load_to_session_type<S: AsRef<str>>(mut self, user_name: S) -> Self {
+        self.limit_load_to_session_type = Some(String::from(user_name.as_ref()));
+        self
+    }
+
+    pub fn with_low_priority_io(mut self, value: bool) -> Self {
+        self.low_priority_io = Some(value);
+        self
+    }
+
+    pub fn low_priority_io(self) -> Self {
+        self.with_low_priority_io(true)
+    }
+
+    pub fn with_mach_services(mut self, services: HashMap<String, MachServiceEntry>) -> Self {
+        self.mach_services = Some(services);
+        self
+    }
+
+    pub fn with_nice(mut self, nice: i32) -> Self {
+        self.nice = Some(nice);
+        self
+    }
+
+    pub fn with_root_directory<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
+        let pathstr = path
+            .as_ref()
+            .to_str()
+            .ok_or(Error::PathConversion)?
+            .to_owned();
+        self.root_directory = Some(pathstr);
+        Ok(self)
+    }
+
+    pub fn with_standard_error_path<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
+        let pathstr = path
+            .as_ref()
+            .to_str()
+            .ok_or(Error::PathConversion)?
+            .to_owned();
+        self.standard_error_path = Some(pathstr);
+        Ok(self)
+    }
+
+    pub fn with_standard_in_path<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
+        let pathstr = path
+            .as_ref()
+            .to_str()
+            .ok_or(Error::PathConversion)?
+            .to_owned();
+        self.standard_in_path = Some(pathstr);
+        Ok(self)
+    }
+
+    pub fn with_standard_out_path<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
+        let pathstr = path
+            .as_ref()
+            .to_str()
+            .ok_or(Error::PathConversion)?
+            .to_owned();
+        self.standard_out_path = Some(pathstr);
+        Ok(self)
+    }
+
+    pub fn with_throttle_interval(mut self, value: u32) -> Self {
+        self.throttle_interval = Some(value);
+        self
+    }
+
+    pub fn with_timeout(mut self, timeout: u32) -> Self {
+        self.time_out = Some(timeout);
+        self
+    }
+
+    pub fn with_umask(mut self, umask: u16) -> Self {
+        self.umask = Some(umask);
+        self
+    }
+
+    pub fn with_wait_for_debugger(mut self, value: bool) -> Self {
+        self.wait_for_debugger = Some(value);
+        self
+    }
+
+    pub fn wait_for_debugger(self) -> Self {
+        self.with_wait_for_debugger(true)
+    }
+
+    pub fn with_working_directory<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
+        let pathstr = path
+            .as_ref()
+            .to_str()
+            .ok_or(Error::PathConversion)?
+            .to_owned();
+        self.working_directory = Some(pathstr);
+        Ok(self)
+    }
+
+    pub fn with_inetd_compatibility(mut self, wait: bool) -> Self {
+        self.inetd_compatibility = Some(HashMap::from([("Wait".to_string(), wait)]));
+        self
+    }
+
+    pub fn with_keep_alive(mut self, keep_alive: KeepAliveType) -> Self {
+        self.keep_alive = Some(keep_alive);
+        self
+    }
+
+    pub fn with_process_type(mut self, process_type: ProcessType) -> Self {
+        self.process_type = Some(process_type);
+        self
+    }
+
+    pub fn with_hard_resource_limits(mut self, limits: ResourceLimits) -> Self {
+        self.hard_resource_limits = Some(limits);
+        self
+    }
+
+    pub fn with_soft_resource_limits(mut self, limits: ResourceLimits) -> Self {
+        self.soft_resource_limits = Some(limits);
+        self
+    }
+
+    pub fn with_socket(mut self, socket: Sockets) -> Self {
+        if let Some(sockets) = self.sockets.take() {
+            match (sockets, socket) {
+                (Sockets::Array(mut arr), Sockets::Array(mut new_arr)) => {
+                    arr.append(&mut new_arr);
+                    self.sockets = Some(Sockets::Array(arr));
+                }
+                (Sockets::Array(mut arr), Sockets::Dictionary(new_dict)) => {
+                    arr.push(new_dict);
+                    self.sockets = Some(Sockets::Array(arr));
+                }
+                (Sockets::Dictionary(dict), Sockets::Dictionary(new_dict)) => {
+                    self.sockets = Some(Sockets::Array(vec![dict, new_dict]))
+                }
+                (Sockets::Dictionary(dict), Sockets::Array(mut new_arr)) => {
+                    new_arr.insert(0, dict);
+                    self.sockets = Some(Sockets::Array(new_arr));
+                }
+            }
+        } else {
+            self.sockets = Some(socket);
+        }
         self
     }
 }
@@ -447,18 +728,47 @@ mod tests {
     #[test]
     fn create_valid_launchd() {
         let check = Launchd {
-            label: "Label".to_string(),
+            abandon_process_group: None,
+            debug: None,
             disabled: None,
-            user_name: None,
+            enable_globbing: None,
+            enable_transactions: None,
+            environment_variables: None,
+            exit_time_out: None,
             group_name: None,
+            inetd_compatibility: None,
+            init_groups: None,
+            hard_resource_limits: None,
+            keep_alive: None,
+            label: "Label".to_string(),
+            launch_only_once: None,
+            limit_load_from_hosts: None,
+            limit_load_to_hosts: None,
+            limit_load_to_session_type: None,
+            low_priority_io: None,
+            mach_services: None,
+            nice: None,
+            process_type: None,
             program: "./henk.sh".to_string(),
             program_arguments: None,
-            run_at_load: None,
-            watch_paths: None,
             queue_directories: None,
-            start_on_mount: None,
-            start_interval: None,
+            root_directory: None,
+            run_at_load: None,
+            sockets: None,
+            soft_resource_limits: None,
+            standard_error_path: None,
+            standard_in_path: None,
+            standard_out_path: None,
             start_calendar_intervals: None,
+            start_interval: None,
+            start_on_mount: None,
+            throttle_interval: None,
+            time_out: None,
+            umask: None,
+            user_name: None,
+            wait_for_debugger: None,
+            watch_paths: None,
+            working_directory: None,
         };
         let test = Launchd::new("Label", "./henk.sh");
         assert!(test.is_ok());
