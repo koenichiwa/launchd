@@ -22,15 +22,7 @@ pub struct ResourceLimits {
 impl ResourceLimits {
     pub fn new() -> Self {
         Self {
-            core: None,
-            cpu: None,
-            data: None,
-            file_size: None,
-            memory_lock: None,
-            number_of_files: None,
-            number_of_processes: None,
-            resident_set_size: None,
-            stack: None,
+            ..Default::default()
         }
     }
 

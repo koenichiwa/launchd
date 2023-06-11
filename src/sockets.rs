@@ -10,7 +10,7 @@ use std::path::Path;
 
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Sockets {
     Dictionary(HashMap<String, SocketOptions>),
     Array(Vec<HashMap<String, SocketOptions>>),
@@ -45,6 +45,7 @@ impl Socket {
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SocketOptions {
@@ -88,17 +89,7 @@ pub enum SocketFamily {
 impl SocketOptions {
     pub fn new() -> Self {
         Self {
-            sock_type: None,
-            sock_passive: None,
-            sock_node_name: None,
-            sock_service_name: None,
-            sock_family: None,
-            sock_protocol: None,
-            sock_path_name: None,
-            secure_socket_with_key: None,
-            sock_path_mode: None,
-            bonjour: None,
-            multicast_group: None,
+            ..Default::default()
         }
     }
 

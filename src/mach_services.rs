@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MachServiceEntry {
     Boolean(bool),
     Map(MachServiceOptions),
@@ -22,8 +22,7 @@ pub struct MachServiceOptions {
 impl MachServiceOptions {
     pub fn new() -> Self {
         Self {
-            reset_at_close: None,
-            hide_until_check_in: None,
+            ..Default::default()
         }
     }
 

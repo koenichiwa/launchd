@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KeepAliveType {
     Enabled(bool),
     Options(KeepAliveOptions),
@@ -37,10 +37,7 @@ pub struct KeepAliveOptions {
 impl KeepAliveOptions {
     pub fn new() -> Self {
         Self {
-            successful_exit: None,
-            network_state: None,
-            path_state: None,
-            other_job_enabled: None,
+            ..Default::default()
         }
     }
 

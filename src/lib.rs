@@ -65,12 +65,14 @@
 mod error;
 pub mod keep_alive;
 pub mod mach_services;
+pub mod process_type;
 pub mod resource_limits;
 pub mod sockets;
 
 pub use self::error::Error;
 pub use self::keep_alive::{KeepAliveOptions, KeepAliveType};
 pub use self::mach_services::MachServiceEntry;
+pub use self::process_type::ProcessType;
 pub use self::resource_limits::ResourceLimits;
 pub use self::sockets::{BonjourTypes, Socket, SocketOptions, Sockets};
 
@@ -117,8 +119,9 @@ use std::path::Path;
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
 // TODO: remove owned Strings (?)
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
@@ -127,11 +130,11 @@ pub struct Launchd {
     limit_load_to_hosts: Option<Vec<String>>,
     limit_load_from_hosts: Option<Vec<String>>,
     limit_load_to_session_type: Option<String>,
-    program: String,
+    program: Option<String>,
     program_arguments: Option<Vec<String>>,
     enable_globbing: Option<bool>,
     enable_transactions: Option<bool>,
-    // OnDemand: Option<bool>, NB: deprecated (see KeepAlive)
+    on_demand: Option<bool>, // NB: deprecated (see KeepAlive), but still needed for reading old plists.
     run_at_load: Option<bool>,
     root_directory: Option<String>,
     working_directory: Option<String>,
@@ -164,14 +167,6 @@ pub struct Launchd {
     mach_services: Option<HashMap<String, MachServiceEntry>>,
     soft_resource_limits: Option<ResourceLimits>,
     hard_resource_limits: Option<ResourceLimits>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-pub enum ProcessType {
-    Background,
-    Standard,
-    Adaptive,
-    Interactive,
 }
 
 /// Representation of a CalendarInterval
@@ -208,46 +203,8 @@ impl Launchd {
             .to_owned();
         Ok(Launchd {
             label: String::from(label.as_ref()),
-            disabled: None,
-            user_name: None,
-            group_name: None,
-            program: pathstr,
-            program_arguments: None,
-            run_at_load: None,
-            watch_paths: None,
-            queue_directories: None,
-            start_on_mount: None,
-            start_interval: None,
-            start_calendar_intervals: None,
-            abandon_process_group: None,
-            debug: None,
-            enable_globbing: None,
-            enable_transactions: None,
-            environment_variables: None,
-            exit_time_out: None,
-            inetd_compatibility: None,
-            init_groups: None,
-            hard_resource_limits: None,
-            keep_alive: None,
-            launch_only_once: None,
-            limit_load_from_hosts: None,
-            limit_load_to_hosts: None,
-            limit_load_to_session_type: None,
-            low_priority_io: None,
-            mach_services: None,
-            nice: None,
-            process_type: None,
-            root_directory: None,
-            soft_resource_limits: None,
-            sockets: None,
-            standard_error_path: None,
-            standard_in_path: None,
-            standard_out_path: None,
-            throttle_interval: None,
-            time_out: None,
-            umask: None,
-            wait_for_debugger: None,
-            working_directory: None,
+            program: Some(pathstr),
+            ..Default::default()
         })
     }
 
@@ -281,7 +238,7 @@ impl Launchd {
             .to_str()
             .ok_or(Error::PathConversion)?
             .to_owned();
-        self.program = pathstr;
+        self.program = Some(pathstr);
         Ok(self)
     }
 
@@ -733,6 +690,7 @@ mod tests {
             disabled: None,
             enable_globbing: None,
             enable_transactions: None,
+            on_demand: None,
             environment_variables: None,
             exit_time_out: None,
             group_name: None,
@@ -749,8 +707,8 @@ mod tests {
             mach_services: None,
             nice: None,
             process_type: None,
-            program: "./henk.sh".to_string(),
             program_arguments: None,
+            program: Some("./henk.sh".to_string()),
             queue_directories: None,
             root_directory: None,
             run_at_load: None,
