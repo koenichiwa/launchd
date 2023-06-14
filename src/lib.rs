@@ -71,13 +71,14 @@ pub mod sockets;
 
 pub use self::error::Error;
 pub use self::keep_alive::{KeepAliveOptions, KeepAliveType};
-pub use self::mach_services::MachServiceEntry;
+pub use self::mach_services::{MachServiceEntry, MachServiceOptions};
 pub use self::process_type::ProcessType;
 pub use self::resource_limits::ResourceLimits;
 pub use self::sockets::{BonjourType, Socket, SocketOptions, Sockets};
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
+use plist::Value;
 #[cfg(feature = "io")]
 use plist::{from_bytes, from_file, from_reader, from_reader_xml};
 #[cfg(feature = "io")]
@@ -141,6 +142,8 @@ pub struct Launchd {
     enable_transactions: Option<bool>,
     enable_pressured_exit: Option<bool>,
     on_demand: Option<bool>, // NB: deprecated (see KeepAlive), but still needed for reading old plists.
+    #[serde(rename = "ServiceIPC")]
+    service_ipc: Option<bool>, // NB: "Please remove this key from your launchd.plist."
     keep_alive: Option<KeepAliveType>,
     run_at_load: Option<bool>,
     root_directory: Option<String>,
@@ -185,7 +188,7 @@ pub struct Launchd {
 // Defined as a "<dictionary of dictionaries of dictionaries>" in launchd.plist(5)
 // Use plist::Value as the value can be String, Integer, Boolean, etc.
 // Doing this precludes the use of #[derive(Eq)] on the Launchd struct, but in practice "PartialEq" is fine.
-type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, plist::Value>>>;
+type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
 
 /// Representation of a CalendarInterval
 ///
@@ -794,7 +797,15 @@ impl CalendarInterval {
 
 #[cfg(test)]
 mod tests {
+
+    macro_rules! test_case {
+        ($fname:expr) => {
+            concat!(env!("CARGO_MANIFEST_DIR"), "/tests/resources/", $fname)
+        };
+    }
+
     use super::*;
+
     #[test]
     fn create_valid_launchd() {
         let check = Launchd {
@@ -805,6 +816,7 @@ mod tests {
             enable_transactions: None,
             enable_pressured_exit: None,
             on_demand: None,
+            service_ipc: None,
             environment_variables: None,
             exit_time_out: None,
             group_name: None,
@@ -888,5 +900,75 @@ mod tests {
             .and_then(|ci| ci.with_month(5));
         assert!(test.is_err());
         eprintln!("{}", test.unwrap_err());
+    }
+
+    #[test]
+    fn load_complex_launch_events_1_plist() {
+        let test = Launchd::from_file(test_case!("launchevents-1.plist")).unwrap();
+
+        match test.launch_events {
+            Some(events) => assert!(events.contains_key("com.apple.distnoted.matching")),
+            _ => panic!("No launch events found"),
+        };
+    }
+
+    #[test]
+    fn load_complex_launch_events_2_plist() {
+        let check: LaunchEvents = vec![(
+            "com.apple.iokit.matching".to_string(),
+            vec![(
+                "com.apple.device-attach".to_string(),
+                vec![
+                    ("IOMatchLaunchStream".to_string(), Value::from(true)),
+                    ("idProduct".to_string(), Value::from("*")),
+                    ("idVendor".to_string(), Value::from(4176)),
+                    ("IOProviderClass".to_string(), Value::from("IOUSBDevice")),
+                ]
+                .into_iter()
+                .collect(),
+            )]
+            .into_iter()
+            .collect(),
+        )]
+        .into_iter()
+        .collect();
+
+        let test = Launchd::from_file(test_case!("launchevents-2.plist")).unwrap();
+
+        match test.launch_events {
+            Some(events) => assert_eq!(events, check),
+            _ => panic!("No launch events found"),
+        };
+    }
+
+    #[test]
+    fn load_complex_machservices_1_plist() {
+        let check = vec![
+            (
+                "com.apple.private.alloy.accessibility.switchcontrol-idswake".to_string(),
+                MachServiceEntry::from(true),
+            ),
+            (
+                "com.apple.AssistiveControl.startup".to_string(),
+                MachServiceEntry::from(MachServiceOptions::new().reset_at_close()),
+            ),
+            (
+                "com.apple.AssistiveControl.running".to_string(),
+                MachServiceEntry::from(
+                    MachServiceOptions::new()
+                        .hide_until_check_in()
+                        .reset_at_close(),
+                ),
+            ),
+        ]
+        .into_iter()
+        .collect();
+
+        let test = Launchd::from_file(test_case!("machservices-1.plist")).unwrap();
+
+        match test.mach_services {
+            Some(events) => assert_eq!(events, check),
+            _ => panic!("No launch events found"),
+        };
     }
 }
