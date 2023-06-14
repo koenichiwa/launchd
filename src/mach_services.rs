@@ -21,9 +21,7 @@ pub struct MachServiceOptions {
 
 impl MachServiceOptions {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self::default()
     }
 
     pub fn with_reset_at_close(mut self, value: bool) -> Self {

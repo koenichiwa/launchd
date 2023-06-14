@@ -74,7 +74,7 @@ pub use self::keep_alive::{KeepAliveOptions, KeepAliveType};
 pub use self::mach_services::MachServiceEntry;
 pub use self::process_type::ProcessType;
 pub use self::resource_limits::ResourceLimits;
-pub use self::sockets::{BonjourTypes, Socket, SocketOptions, Sockets};
+pub use self::sockets::{BonjourType, Socket, SocketOptions, Sockets};
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
@@ -121,25 +121,32 @@ use std::path::Path;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
     user_name: Option<String>,
     group_name: Option<String>,
+    #[serde(rename = "inetdCompatibility")]
+    inetd_compatibility: Option<HashMap<InetdCompatibility, bool>>,
     limit_load_to_hosts: Option<Vec<String>>,
     limit_load_from_hosts: Option<Vec<String>>,
-    limit_load_to_session_type: Option<String>,
-    program: Option<String>,
+    limit_load_to_session_type: Option<LoadSessionType>,
+    limit_load_to_hardware: Option<HashMap<String, Vec<String>>>,
+    limit_load_from_hardware: Option<HashMap<String, Vec<String>>>,
+    program: Option<String>, // TODO: Ensure this: "NOTE: The Program key must be an absolute path."
+    bundle_program: Option<String>,
     program_arguments: Option<Vec<String>>,
     enable_globbing: Option<bool>,
     enable_transactions: Option<bool>,
+    enable_pressured_exit: Option<bool>,
     on_demand: Option<bool>, // NB: deprecated (see KeepAlive), but still needed for reading old plists.
+    keep_alive: Option<KeepAliveType>,
     run_at_load: Option<bool>,
     root_directory: Option<String>,
     working_directory: Option<String>,
     environment_variables: Option<HashMap<String, String>>,
-    umask: Option<u16>, // NB: Defined as: typedef __uint16_t __darwin_mode_t;
+    umask: Option<u16>, // NB: This is a Unix permission mask. Defined as: typedef __uint16_t __darwin_mode_t;
     time_out: Option<u32>,
     exit_time_out: Option<u32>,
     throttle_interval: Option<u32>,
@@ -152,22 +159,33 @@ pub struct Launchd {
     standard_in_path: Option<String>,
     standard_out_path: Option<String>,
     standard_error_path: Option<String>,
-    #[serde(rename = "inetdCompatibility")]
-    inetd_compatibility: Option<HashMap<String, bool>>,
-    keep_alive: Option<KeepAliveType>,
-    process_type: Option<ProcessType>,
-    sockets: Option<Sockets>,
-    abandon_process_group: Option<bool>,
-    nice: Option<i32>,
-    launch_only_once: Option<bool>,
     debug: Option<bool>,
     wait_for_debugger: Option<bool>,
-    #[serde(rename = "LowPriorityIO")]
-    low_priority_io: Option<bool>,
-    mach_services: Option<HashMap<String, MachServiceEntry>>,
     soft_resource_limits: Option<ResourceLimits>,
     hard_resource_limits: Option<ResourceLimits>,
+    nice: Option<i32>,
+    process_type: Option<ProcessType>,
+    abandon_process_group: Option<bool>,
+    #[serde(rename = "LowPriorityIO")]
+    low_priority_io: Option<bool>,
+    #[serde(rename = "LowPriorityBackgroundIO")]
+    low_priority_background_io: Option<bool>,
+    materialize_dataless_files: Option<bool>,
+    launch_only_once: Option<bool>,
+    mach_services: Option<HashMap<String, MachServiceEntry>>,
+    sockets: Option<Sockets>,
+    launch_events: Option<LaunchEvents>,
+    hopefully_exits_last: Option<bool>, // NB: Deprecated, keep for reading old plists.
+    hopefully_exits_first: Option<bool>, // NB: Deprecated, keep for reading old plists.
+    session_create: Option<bool>,
+    legacy_timers: Option<bool>, // NB: Deprecated, keep for reading old plists.
+                                 // associated_bundle_identifiers: Option<<string or array of strings>>
 }
+
+// Defined as a "<dictionary of dictionaries of dictionaries>" in launchd.plist(5)
+// Use plist::Value as the value can be String, Integer, Boolean, etc.
+// Doing this precludes the use of #[derive(Eq)] on the Launchd struct, but in practice "PartialEq" is fine.
+type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, plist::Value>>>;
 
 /// Representation of a CalendarInterval
 ///
@@ -191,6 +209,45 @@ pub struct CalendarInterval {
     day: Option<u8>,
     weekday: Option<u8>,
     month: Option<u8>,
+}
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InetdCompatibility {
+    Wait, // Exclude a "NoWait" as that is not a valid key.
+}
+
+// Move LoadSessionType to it's own module?
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(untagged))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LoadSessionType {
+    BareString(String),
+    Array(Vec<String>),
+}
+
+impl From<String> for LoadSessionType {
+    fn from(value: String) -> Self {
+        LoadSessionType::BareString(value)
+    }
+}
+
+impl From<&str> for LoadSessionType {
+    fn from(value: &str) -> Self {
+        LoadSessionType::BareString(value.to_owned())
+    }
+}
+
+impl From<Vec<String>> for LoadSessionType {
+    fn from(value: Vec<String>) -> Self {
+        LoadSessionType::Array(value)
+    }
+}
+
+impl From<Vec<&str>> for LoadSessionType {
+    fn from(value: Vec<&str>) -> Self {
+        LoadSessionType::Array(value.into_iter().map(|s| s.to_owned()).collect())
+    }
 }
 
 // TODO: This can be generated by a macro (maybe derive_builder?)
@@ -240,6 +297,11 @@ impl Launchd {
             .to_owned();
         self.program = Some(pathstr);
         Ok(self)
+    }
+
+    pub fn with_bundle_program<S: AsRef<str>>(mut self, bundle: S) -> Self {
+        self.bundle_program = Some(String::from(bundle.as_ref()));
+        self
     }
 
     pub fn with_program_arguments(mut self, program_arguments: Vec<String>) -> Self {
@@ -324,6 +386,15 @@ impl Launchd {
         self.with_enable_transactions(true)
     }
 
+    pub fn with_enable_pressured_exit(mut self, value: bool) -> Self {
+        self.enable_pressured_exit = Some(value);
+        self
+    }
+
+    pub fn enable_pressured_exit(self) -> Self {
+        self.with_enable_pressured_exit(true)
+    }
+
     pub fn with_environment_variables(mut self, env: HashMap<String, String>) -> Self {
         self.environment_variables = Some(env);
         self
@@ -362,8 +433,18 @@ impl Launchd {
         self
     }
 
-    pub fn with_limit_load_to_session_type<S: AsRef<str>>(mut self, user_name: S) -> Self {
-        self.limit_load_to_session_type = Some(String::from(user_name.as_ref()));
+    pub fn with_limit_load_to_session_type(mut self, value: LoadSessionType) -> Self {
+        self.limit_load_to_session_type = Some(value);
+        self
+    }
+
+    pub fn with_limit_load_to_hardware(mut self, value: HashMap<String, Vec<String>>) -> Self {
+        self.limit_load_to_hardware = Some(value);
+        self
+    }
+
+    pub fn with_limit_load_from_hardware(mut self, value: HashMap<String, Vec<String>>) -> Self {
+        self.limit_load_from_hardware = Some(value);
         self
     }
 
@@ -374,6 +455,15 @@ impl Launchd {
 
     pub fn low_priority_io(self) -> Self {
         self.with_low_priority_io(true)
+    }
+
+    pub fn with_low_priority_background_io(mut self, value: bool) -> Self {
+        self.low_priority_background_io = Some(value);
+        self
+    }
+
+    pub fn low_priority_background_io(self) -> Self {
+        self.with_low_priority_background_io(true)
     }
 
     pub fn with_mach_services(mut self, services: HashMap<String, MachServiceEntry>) -> Self {
@@ -450,6 +540,15 @@ impl Launchd {
         self.with_wait_for_debugger(true)
     }
 
+    pub fn with_materialize_dataless_files(mut self, value: bool) -> Self {
+        self.materialize_dataless_files = Some(value);
+        self
+    }
+
+    pub fn materialize_dataless_files(self) -> Self {
+        self.with_materialize_dataless_files(true)
+    }
+
     pub fn with_working_directory<P: AsRef<Path>>(mut self, path: P) -> Result<Self, Error> {
         let pathstr = path
             .as_ref()
@@ -461,7 +560,7 @@ impl Launchd {
     }
 
     pub fn with_inetd_compatibility(mut self, wait: bool) -> Self {
-        self.inetd_compatibility = Some(HashMap::from([("Wait".to_string(), wait)]));
+        self.inetd_compatibility = Some(HashMap::from([(InetdCompatibility::Wait, wait)]));
         self
     }
 
@@ -508,6 +607,20 @@ impl Launchd {
             self.sockets = Some(socket);
         }
         self
+    }
+
+    pub fn with_launch_events(mut self, value: LaunchEvents) -> Self {
+        self.launch_events = Some(value);
+        self
+    }
+
+    pub fn with_session_create(mut self, value: bool) -> Self {
+        self.session_create = Some(value);
+        self
+    }
+
+    pub fn session_create(self) -> Self {
+        self.with_session_create(true)
     }
 }
 
@@ -690,6 +803,7 @@ mod tests {
             disabled: None,
             enable_globbing: None,
             enable_transactions: None,
+            enable_pressured_exit: None,
             on_demand: None,
             environment_variables: None,
             exit_time_out: None,
@@ -700,15 +814,25 @@ mod tests {
             keep_alive: None,
             label: "Label".to_string(),
             launch_only_once: None,
+            launch_events: None,
+            legacy_timers: None,
             limit_load_from_hosts: None,
             limit_load_to_hosts: None,
             limit_load_to_session_type: None,
+            limit_load_to_hardware: None,
+            limit_load_from_hardware: None,
             low_priority_io: None,
+            low_priority_background_io: None,
+            hopefully_exits_first: None,
+            hopefully_exits_last: None,
             mach_services: None,
+            materialize_dataless_files: None,
+            session_create: None,
             nice: None,
             process_type: None,
             program_arguments: None,
             program: Some("./henk.sh".to_string()),
+            bundle_program: None,
             queue_directories: None,
             root_directory: None,
             run_at_load: None,

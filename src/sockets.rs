@@ -58,7 +58,7 @@ pub struct SocketOptions {
     sock_path_name: Option<String>,
     secure_socket_with_key: Option<String>,
     sock_path_mode: Option<i128>,
-    bonjour: Option<BonjourTypes>,
+    bonjour: Option<BonjourType>,
     multicast_group: Option<String>,
 }
 
@@ -88,9 +88,7 @@ pub enum SocketFamily {
 
 impl SocketOptions {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self::default()
     }
 
     pub fn with_type(mut self, value: SocketType) -> Self {
@@ -147,7 +145,7 @@ impl SocketOptions {
         self
     }
 
-    pub fn with_bonjour(mut self, value: BonjourTypes) -> Self {
+    pub fn with_bonjour(mut self, value: BonjourType) -> Self {
         self.bonjour = Some(value);
         self
     }
@@ -161,26 +159,26 @@ impl SocketOptions {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(untagged))]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum BonjourTypes {
+pub enum BonjourType {
     Boolean(bool),
     String(String),
     Array(Vec<String>),
 }
 
-impl From<bool> for BonjourTypes {
+impl From<bool> for BonjourType {
     fn from(value: bool) -> Self {
-        BonjourTypes::Boolean(value)
+        BonjourType::Boolean(value)
     }
 }
 
-impl From<String> for BonjourTypes {
+impl From<String> for BonjourType {
     fn from(value: String) -> Self {
-        BonjourTypes::String(value)
+        BonjourType::String(value)
     }
 }
 
-impl From<Vec<String>> for BonjourTypes {
+impl From<Vec<String>> for BonjourType {
     fn from(value: Vec<String>) -> Self {
-        BonjourTypes::Array(value)
+        BonjourType::Array(value)
     }
 }

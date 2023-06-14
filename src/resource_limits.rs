@@ -21,9 +21,7 @@ pub struct ResourceLimits {
 
 impl ResourceLimits {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self::default()
     }
 
     pub fn with_core(mut self, value: u64) -> Self {

@@ -36,9 +36,7 @@ pub struct KeepAliveOptions {
 
 impl KeepAliveOptions {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self::default()
     }
 
     pub fn with_successful_exit(mut self, value: bool) -> Self {
