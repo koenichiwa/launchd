@@ -903,6 +903,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "io")]
     fn load_complex_launch_events_1_plist() {
         let test = Launchd::from_file(test_case!("launchevents-1.plist")).unwrap();
 
@@ -913,6 +914,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "io")]
     fn load_complex_launch_events_2_plist() {
         let check: LaunchEvents = vec![(
             "com.apple.iokit.matching".to_string(),
@@ -942,6 +944,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "io")]
     fn load_complex_machservices_1_plist() {
         let check = vec![
             (
