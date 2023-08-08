@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct ResourceLimits {
     core: Option<u64>,
-    #[serde(rename = "CPU")]
+    #[cfg_attr(feature = "serde", serde(rename = "CPU"))]
     cpu: Option<u64>,
     data: Option<u64>,
     file_size: Option<u64>,
