@@ -5,7 +5,7 @@ A Rust library for creating and parsing Launchd files.
 It's still in early development and all help is welcome.
 
 The syntax for building launchd files is still subject for change. 
-Launchd has a lot of properties, and I'm considering using [derive_builder](https://docs.rs/derive_builder/0.9.0/derive_builder/) or something similar to reduce boilerplate code, and increase maintainability. I'm hoping to have made that decision by `v0.3.0`. Suggestions are [welcome](https://github.com/koenichiwa/launchd/issues/1)!
+Launchd has a lot of properties, and I'm considering using [derive_builder](https://docs.rs/derive_builder/0.9.0/derive_builder/) or something similar to reduce boilerplate code, and increase maintainability. I'm hoping to have made that decision by `v0.4.0`. Suggestions are [welcome](https://github.com/koenichiwa/launchd/issues/1)!
 
 The `Launchd` struct is not yet complete. The fields are not public by design, so I can add (but not delete) fields through patches, without the need to create a new minor version.
 
@@ -19,7 +19,7 @@ Launchd is MacOS's way of scheduling programs and services to be ran.
 
 For more information: [Wiki](https://en.wikipedia.org/wiki/Launchd).
 
-For a more detailed description of the parameters run `man launchd.plist` on your Apple computer or check out: [manpagez](https://www.manpagez.com/man/5/launchd.plist/).
+For a more detailed description of the parameters run `man launchd.plist` on your Apple computer or check out: [manpagez](https://www.manpagez.com/man/5/launchd.plist/) or [xcode-man-pages](https://keith.github.io/xcode-man-pages/launchd.plist.5.html).
 
 ### Why not cron?
 MacOS deprecated cron, the previous way of scheduling programs.
@@ -34,21 +34,21 @@ The parsing of systemd is not included in this library.
 ## Usage
 Add this to your Cargo.toml dependencies:
 ``` toml
-launchd = "0.2.0"
+launchd = "0.3.0"
 ```
 
 ## Features
 ### Default
 ``` toml
-launchd = {version = "0.2.0", features=["io"]}
+launchd = {version = "0.3.0", features=["io"]}
 ```
 ### Translate crontabs
 ``` toml
-launchd = {version = "0.2.0", features=["cron"]}
+launchd = {version = "0.3.0", features=["cron"]}
 ```
 ### Without the plist writer
 ``` toml
-launchd = {version = "0.2.0", default-features = false, features=["serde"]}
+launchd = {version = "0.3.0", default-features = false, features=["serde"]}
 ```
 
 ## Example
