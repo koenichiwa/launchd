@@ -128,7 +128,7 @@ pub struct Launchd {
     disabled: Option<bool>,
     user_name: Option<String>,
     group_name: Option<String>,
-    #[serde(rename = "inetdCompatibility")]
+    #[cfg_attr(feature = "serde", serde(rename = "inetdCompatibility"))]
     inetd_compatibility: Option<HashMap<InetdCompatibility, bool>>,
     limit_load_to_hosts: Option<Vec<String>>,
     limit_load_from_hosts: Option<Vec<String>>,
@@ -142,7 +142,7 @@ pub struct Launchd {
     enable_transactions: Option<bool>,
     enable_pressured_exit: Option<bool>,
     on_demand: Option<bool>, // NB: deprecated (see KeepAlive), but still needed for reading old plists.
-    #[serde(rename = "ServiceIPC")]
+    #[cfg_attr(feature = "serde", serde(rename = "ServiceIPC"))]
     service_ipc: Option<bool>, // NB: "Please remove this key from your launchd.plist."
     keep_alive: Option<KeepAliveType>,
     run_at_load: Option<bool>,
@@ -169,9 +169,9 @@ pub struct Launchd {
     nice: Option<i32>,
     process_type: Option<ProcessType>,
     abandon_process_group: Option<bool>,
-    #[serde(rename = "LowPriorityIO")]
+    #[cfg_attr(feature = "serde", serde(rename = "LowPriorityIO"))]
     low_priority_io: Option<bool>,
-    #[serde(rename = "LowPriorityBackgroundIO")]
+    #[cfg_attr(feature = "serde", serde(rename = "LowPriorityBackgroundIO"))]
     low_priority_background_io: Option<bool>,
     materialize_dataless_files: Option<bool>,
     launch_only_once: Option<bool>,
