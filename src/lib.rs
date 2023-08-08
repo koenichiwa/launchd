@@ -78,6 +78,7 @@ pub use self::sockets::{BonjourType, Socket, SocketOptions, Sockets};
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
+#[cfg(feature = "plist")]
 use plist::Value;
 #[cfg(feature = "io")]
 use plist::{from_bytes, from_file, from_reader, from_reader_xml};
@@ -188,7 +189,12 @@ pub struct Launchd {
 // Defined as a "<dictionary of dictionaries of dictionaries>" in launchd.plist(5)
 // Use plist::Value as the value can be String, Integer, Boolean, etc.
 // Doing this precludes the use of #[derive(Eq)] on the Launchd struct, but in practice "PartialEq" is fine.
+#[cfg(feature = "plist")]
 type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
+
+// TODO: the current implementation is dependent on plist. Is this necessary?
+#[cfg(not(feature = "plist"))]
+type LaunchEvents = ();
 
 /// Representation of a CalendarInterval
 ///
@@ -798,6 +804,7 @@ impl CalendarInterval {
 #[cfg(test)]
 mod tests {
 
+    #[cfg(feature = "io")]
     macro_rules! test_case {
         ($fname:expr) => {
             concat!(env!("CARGO_MANIFEST_DIR"), "/tests/resources/", $fname)
