@@ -12,7 +12,7 @@ pub enum Error {
 
     #[cfg(feature = "cron")]
     #[error("The crontab generated an invalid value: {0}")]
-    InvalidCronField(u32), // TODO: Change u32 to cron::Ordinal when possible. See: https://github.com/zslayton/cron/issues/82
+    InvalidCronField(u32),
 
     #[cfg(feature = "io")]
     #[error(transparent)]
