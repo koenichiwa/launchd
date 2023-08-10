@@ -7,6 +7,19 @@ use std::convert::TryInto;
 
 use crate::Error;
 
+/// Representation of a CalendarInterval
+///
+/// Usage:
+/// ```
+/// use launchd::{CalendarInterval, Error};
+/// fn example() -> Result<(), Error> {
+///     let calendarinterval = CalendarInterval::default()
+///             .with_hour(12)?
+///             .with_minute(0)?
+///             .with_weekday(7);
+///     Ok(())
+/// }
+/// ```
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Default, Hash)]
 #[serde(rename_all = "PascalCase")]
 pub struct CalendarInterval {
@@ -18,10 +31,12 @@ pub struct CalendarInterval {
 }
 
 impl CalendarInterval {
+    /// Creates a new empty `CalendarInterval`.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Sets the minute component of the calendar interval.
     pub fn with_minute(self, minute: u8) -> Result<Self, Error> {
         if minute > 59 {
             Err(Error::CalendarFieldOutOfBounds(0..=59, minute))
@@ -32,6 +47,7 @@ impl CalendarInterval {
         }
     }
 
+    /// Sets the hour component of the calendar interval.
     pub fn with_hour(self, hour: u8) -> Result<Self, Error> {
         if hour > 23 {
             Err(Error::CalendarFieldOutOfBounds(0..=23, hour))
@@ -42,6 +58,7 @@ impl CalendarInterval {
         }
     }
 
+    /// Sets the day component of the calendar interval.
     pub fn with_day(self, day: u8) -> Result<Self, Error> {
         if day == 0 || day > 31 {
             Err(Error::CalendarFieldOutOfBounds(1..=31, day))
@@ -52,6 +69,7 @@ impl CalendarInterval {
         }
     }
 
+    /// Sets the weekday component of the calendar interval.
     pub fn with_weekday(self, weekday: u8) -> Result<Self, Error> {
         if weekday > 7 {
             Err(Error::CalendarFieldOutOfBounds(0..=7, weekday))
@@ -62,6 +80,7 @@ impl CalendarInterval {
         }
     }
 
+    /// Sets the month component of the calendar interval.
     pub fn with_month(self, month: u8) -> Result<Self, Error> {
         if month == 0 || month > 12 {
             Err(Error::CalendarFieldOutOfBounds(1..=12, month))
@@ -76,6 +95,7 @@ impl CalendarInterval {
 #[cfg(feature = "cron")]
 impl CalendarInterval {
     // This has some use for launchd::with_start_calendar_intervals as well
+    /// Checks if the `CalendarInterval` is initialized.
     fn is_initialized(&self) -> bool {
         self.minute.is_some()
             || self.hour.is_some()
@@ -84,6 +104,7 @@ impl CalendarInterval {
             || self.month.is_some()
     }
 
+    /// Converts a `cron` schedule into a vector of `CalendarInterval` instances.
     pub fn from_cron_schedule(schedule: Schedule) -> Result<Vec<Self>, Error> {
         let mut result_vec = Vec::new();
         for month in schedule.months().iter() {

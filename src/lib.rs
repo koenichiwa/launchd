@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 //! A Rust library for creating and parsing Launchd files.
 //!
 //! It's still in early development and all help is welcome.
@@ -180,20 +181,6 @@ pub struct Launchd {
 // Use plist::Value as the value can be String, Integer, Boolean, etc.
 // Doing this precludes the use of #[derive(Eq)] on the Launchd struct, but in practice "PartialEq" is fine.
 type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
-
-/// Representation of a CalendarInterval
-///
-/// Usage:
-/// ```
-/// use launchd::{CalendarInterval, Error};
-/// fn example() -> Result<(), Error> {
-///     let calendarinterval = CalendarInterval::default()
-///             .with_hour(12)?
-///             .with_minute(0)?
-///             .with_weekday(7);
-///     Ok(())
-/// }
-/// ```
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InetdCompatibility {
