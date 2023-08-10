@@ -1,14 +1,13 @@
 // See the HardResourceLimits / SoftResourceLimits section of https://www.manpagez.com/man/5/launchd.plist/
 //
-#[cfg(feature = "serde")]
+
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
 pub struct ResourceLimits {
     core: Option<u64>,
-    #[cfg_attr(feature = "serde", serde(rename = "CPU"))]
+    #[serde(rename = "CPU")]
     cpu: Option<u64>,
     data: Option<u64>,
     file_size: Option<u64>,

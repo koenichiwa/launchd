@@ -19,11 +19,7 @@
 //!             .with_start_calendar_intervals(vec![ci])
 //!             .disabled();
 //!
-//!     #[cfg(feature="io")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
-//!
-//!     #[cfg(not(feature="io"))] // If you don't want to build any optional dependencies
-//!     return Ok(());
 //! }
 //! ```
 //!
@@ -78,18 +74,14 @@ pub use self::sockets::{BonjourType, Socket, SocketOptions, Sockets};
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
-#[cfg(feature = "plist")]
 use plist::Value;
-#[cfg(feature = "io")]
 use plist::{from_bytes, from_file, from_reader, from_reader_xml};
-#[cfg(feature = "io")]
 use plist::{to_file_binary, to_file_xml, to_writer_binary, to_writer_xml};
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
 use std::collections::HashMap;
 #[cfg(feature = "cron")]
 use std::convert::TryInto;
-#[cfg(feature = "io")]
 use std::io::{Read, Seek, Write};
 use std::path::Path;
 
@@ -120,16 +112,15 @@ use std::path::Path;
 /// NB: The usage is still subject to change.
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
 // TODO: remove owned Strings (?)
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Default, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "PascalCase")]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
     user_name: Option<String>,
     group_name: Option<String>,
-    #[cfg_attr(feature = "serde", serde(rename = "inetdCompatibility"))]
+    #[serde(rename = "inetdCompatibility")]
     inetd_compatibility: Option<HashMap<InetdCompatibility, bool>>,
     limit_load_to_hosts: Option<Vec<String>>,
     limit_load_from_hosts: Option<Vec<String>>,
@@ -143,7 +134,7 @@ pub struct Launchd {
     enable_transactions: Option<bool>,
     enable_pressured_exit: Option<bool>,
     on_demand: Option<bool>, // NB: deprecated (see KeepAlive), but still needed for reading old plists.
-    #[cfg_attr(feature = "serde", serde(rename = "ServiceIPC"))]
+    #[serde(rename = "ServiceIPC")]
     service_ipc: Option<bool>, // NB: "Please remove this key from your launchd.plist."
     keep_alive: Option<KeepAliveType>,
     run_at_load: Option<bool>,
@@ -170,9 +161,9 @@ pub struct Launchd {
     nice: Option<i32>,
     process_type: Option<ProcessType>,
     abandon_process_group: Option<bool>,
-    #[cfg_attr(feature = "serde", serde(rename = "LowPriorityIO"))]
+    #[serde(rename = "LowPriorityIO")]
     low_priority_io: Option<bool>,
-    #[cfg_attr(feature = "serde", serde(rename = "LowPriorityBackgroundIO"))]
+    #[serde(rename = "LowPriorityBackgroundIO")]
     low_priority_background_io: Option<bool>,
     materialize_dataless_files: Option<bool>,
     launch_only_once: Option<bool>,
@@ -189,12 +180,7 @@ pub struct Launchd {
 // Defined as a "<dictionary of dictionaries of dictionaries>" in launchd.plist(5)
 // Use plist::Value as the value can be String, Integer, Boolean, etc.
 // Doing this precludes the use of #[derive(Eq)] on the Launchd struct, but in practice "PartialEq" is fine.
-#[cfg(feature = "plist")]
 type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
-
-// TODO: the current implementation is dependent on plist. Is this necessary?
-#[cfg(not(feature = "plist"))]
-type LaunchEvents = ();
 
 /// Representation of a CalendarInterval
 ///
@@ -209,9 +195,8 @@ type LaunchEvents = ();
 ///     Ok(())
 /// }
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Default)]
+#[serde(rename_all = "PascalCase")]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
@@ -220,16 +205,14 @@ pub struct CalendarInterval {
     month: Option<u8>,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InetdCompatibility {
     Wait, // Exclude a "NoWait" as that is not a valid key.
 }
 
 // Move LoadSessionType to it's own module?
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
 pub enum LoadSessionType {
     BareString(String),
     Array(Vec<String>),
@@ -631,10 +614,7 @@ impl Launchd {
     pub fn session_create(self) -> Self {
         self.with_session_create(true)
     }
-}
 
-#[cfg(feature = "io")]
-impl Launchd {
     // Write --
     pub fn to_writer_xml<W: Write>(&self, writer: W) -> Result<(), Error> {
         to_writer_xml(writer, self).map_err(Error::Write)
@@ -803,8 +783,6 @@ impl CalendarInterval {
 
 #[cfg(test)]
 mod tests {
-
-    #[cfg(feature = "io")]
     macro_rules! test_case {
         ($fname:expr) => {
             concat!(env!("CARGO_MANIFEST_DIR"), "/tests/resources/", $fname)
@@ -910,7 +888,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "io")]
     fn load_complex_launch_events_1_plist() {
         let test = Launchd::from_file(test_case!("launchevents-1.plist")).unwrap();
 
@@ -921,7 +898,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "io")]
     fn load_complex_launch_events_2_plist() {
         let check: LaunchEvents = vec![(
             "com.apple.iokit.matching".to_string(),
@@ -951,7 +927,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "io")]
     fn load_complex_machservices_1_plist() {
         let check = vec![
             (

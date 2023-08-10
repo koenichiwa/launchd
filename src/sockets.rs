@@ -2,15 +2,14 @@
 //
 
 use crate::error::Error;
-#[cfg(feature = "serde")]
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::Path;
 
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
 pub enum Sockets {
     Dictionary(HashMap<String, SocketOptions>),
     Array(Vec<HashMap<String, SocketOptions>>),
@@ -22,8 +21,7 @@ impl From<Socket> for Sockets {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Socket {
     values: HashMap<String, SocketOptions>,
 }
@@ -44,10 +42,9 @@ impl Socket {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "PascalCase")]
 pub struct SocketOptions {
     sock_type: Option<SocketType>,
     sock_passive: Option<bool>,
@@ -62,24 +59,21 @@ pub struct SocketOptions {
     multicast_group: Option<String>,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
 pub enum SocketType {
     Dgram,
     Stream,
     Seqpacket,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "UPPERCASE"))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "UPPERCASE")]
 pub enum SocketProtocol {
     Tcp,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum SocketFamily {
     IPv4,
     IPv6,
@@ -156,9 +150,8 @@ impl SocketOptions {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
 pub enum BonjourType {
     Boolean(bool),
     String(String),

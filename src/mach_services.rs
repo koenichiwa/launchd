@@ -1,19 +1,17 @@
 // See the MachServices section in https://www.manpagez.com/man/5/launchd.plist/
 //
-#[cfg(feature = "serde")]
+
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
 pub enum MachServiceEntry {
     Boolean(bool),
     Map(MachServiceOptions),
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[serde(rename_all = "PascalCase")]
 pub struct MachServiceOptions {
     reset_at_close: Option<bool>,
     hide_until_check_in: Option<bool>,
