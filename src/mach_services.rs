@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// Enumeration of different types of Mach service entries.
 /// See the MachServices section in https://www.manpagez.com/man/5/launchd.plist/
-/// 
+///
 /// This enum represents different ways to configure a Mach service entry.
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(untagged)]
