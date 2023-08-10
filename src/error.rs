@@ -1,20 +1,27 @@
-use std::{ops::RangeInclusive, path::PathBuf};
+use std::ops::RangeInclusive;
 use thiserror::Error;
 
+/// Custom error types for handling various errors related to configuration parsing and processing.
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("CalendarField field with value: {1} should lie in inclusive range: {0:?}")]
+    /// Indicates that a calendar field value is out of the specified inclusive range.
+    #[error("CalendarField value: {1} is out of the inclusive range: {0:?}")]
     CalendarFieldOutOfBounds(RangeInclusive<u8>, u8),
-    #[error("The path could not be parsed {0:?}")]
-    // TODO: Show path. Is this really needed (invalid paths are not rejected)
-    PathConversion(PathBuf),
+
+    /// Represents errors that occur during reading operations.
     #[error(transparent)]
     Read(plist::Error),
+
+    /// Represents errors that occur during writing operations.
     #[error(transparent)]
     Write(plist::Error),
-    #[error("Could not read value {0}")]
+
+    /// Indicates a failed deserialization attempt for an enumeration value.
+    #[error("Failed to deserialize the enumeration value: {0}")]
     EnumDeserialization(String),
+
+    /// Represents an error when the crontab generates an invalid value.
     #[cfg(feature = "cron")]
-    #[error("The crontab generated an invalid value: {0}")]
+    #[error("The generated crontab value is invalid: {0}")]
     InvalidCronField(u32),
 }
