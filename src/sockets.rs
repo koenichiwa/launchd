@@ -22,8 +22,7 @@ impl From<Socket> for Sockets {
     }
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Socket {
     values: HashMap<String, SocketOptions>,
 }
@@ -78,8 +77,7 @@ pub enum SocketProtocol {
     Tcp,
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum SocketFamily {
     IPv4,
     IPv6,

@@ -211,8 +211,7 @@ pub struct CalendarInterval {
     month: Option<u8>,
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InetdCompatibility {
     Wait, // Exclude a "NoWait" as that is not a valid key.
 }
@@ -623,7 +622,6 @@ impl Launchd {
         self.with_session_create(true)
     }
 }
-
 
 impl Launchd {
     // Write --

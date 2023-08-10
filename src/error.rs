@@ -14,10 +14,9 @@ pub enum Error {
     #[error("The crontab generated an invalid value: {0}")]
     InvalidCronField(u32),
 
-    
     #[error(transparent)]
     Read(plist::Error),
-    
+
     #[error(transparent)]
     Write(plist::Error),
 }
