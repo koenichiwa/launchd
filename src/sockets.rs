@@ -1,12 +1,10 @@
 // See the Sockets section in https://www.manpagez.com/man/5/launchd.plist/
 //
 
-use crate::error::Error;
-
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Deref;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
@@ -35,9 +33,9 @@ impl Deref for Socket {
 }
 
 impl Socket {
-    pub fn new<S: AsRef<str>>(name: S, options: SocketOptions) -> Self {
+    pub fn new(name: String, options: SocketOptions) -> Self {
         Self {
-            values: HashMap::from([(name.as_ref().to_string(), options)]),
+            values: HashMap::from([(name, options)]),
         }
     }
 }
@@ -52,7 +50,7 @@ pub struct SocketOptions {
     sock_service_name: Option<String>,
     sock_family: Option<SocketFamily>,
     sock_protocol: Option<SocketProtocol>,
-    sock_path_name: Option<String>,
+    sock_path_name: Option<PathBuf>,
     secure_socket_with_key: Option<String>,
     sock_path_mode: Option<i128>,
     bonjour: Option<BonjourType>,
@@ -99,13 +97,13 @@ impl SocketOptions {
         self.with_passive(true)
     }
 
-    pub fn with_node_name<S: AsRef<str>>(mut self, value: S) -> Self {
-        self.sock_node_name = Some(value.as_ref().to_string());
+    pub fn with_node_name(mut self, value: String) -> Self {
+        self.sock_node_name = Some(value);
         self
     }
 
-    pub fn with_service_name<S: AsRef<str>>(mut self, value: S) -> Self {
-        self.sock_service_name = Some(value.as_ref().to_string());
+    pub fn with_service_name(mut self, value: String) -> Self {
+        self.sock_service_name = Some(value);
         self
     }
 
@@ -119,18 +117,13 @@ impl SocketOptions {
         self
     }
 
-    pub fn with_path_name<P: AsRef<Path>>(mut self, name: P) -> Result<Self, Error> {
-        let pathstr = name
-            .as_ref()
-            .to_str()
-            .ok_or(Error::PathConversion(PathBuf::from(name.as_ref())))?
-            .to_owned();
-        self.sock_path_name = Some(pathstr);
-        Ok(self)
+    pub fn with_path_name(mut self, path: PathBuf) -> Self {
+        self.sock_path_name = Some(path);
+        self
     }
 
-    pub fn with_secure_socket_key<S: AsRef<str>>(mut self, value: S) -> Self {
-        self.secure_socket_with_key = Some(value.as_ref().to_string());
+    pub fn with_secure_socket_key(mut self, value: String) -> Self {
+        self.secure_socket_with_key = Some(value);
         self
     }
 
@@ -144,8 +137,8 @@ impl SocketOptions {
         self
     }
 
-    pub fn with_multicast_group<S: AsRef<str>>(mut self, value: S) -> Self {
-        self.multicast_group = Some(value.as_ref().to_string());
+    pub fn with_multicast_group(mut self, value: String) -> Self {
+        self.multicast_group = Some(value);
         self
     }
 }
