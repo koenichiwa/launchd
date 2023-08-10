@@ -19,11 +19,7 @@
 //!             .with_start_calendar_intervals(vec![ci])
 //!             .disabled();
 //!
-//!     #[cfg(feature="serde")] // Default
 //!     return launchd.to_writer_xml(std::io::stdout());
-//!
-//!     #[cfg(not(feature="serde"))] // If you don't want to build any optional dependencies
-//!     return Ok(());
 //! }
 //! ```
 //!
