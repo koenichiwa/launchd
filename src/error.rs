@@ -17,5 +17,4 @@ pub enum Error {
     #[cfg(feature = "cron")]
     #[error("The crontab generated an invalid value: {0}")]
     InvalidCronField(u32),
-
 }
