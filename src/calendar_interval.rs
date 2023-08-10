@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
@@ -7,7 +7,7 @@ use std::convert::TryInto;
 
 use crate::Error;
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Default, Hash)]
 #[serde(rename_all = "PascalCase")]
 pub struct CalendarInterval {
     minute: Option<u8>,
@@ -71,8 +71,6 @@ impl CalendarInterval {
             Ok(result)
         }
     }
-
-    
 }
 
 #[cfg(feature = "cron")]
@@ -85,7 +83,7 @@ impl CalendarInterval {
             || self.weekday.is_some()
             || self.month.is_some()
     }
-    
+
     pub fn from_cron_schedule(schedule: Schedule) -> Result<Vec<Self>, Error> {
         let mut result_vec = Vec::new();
         for month in schedule.months().iter() {

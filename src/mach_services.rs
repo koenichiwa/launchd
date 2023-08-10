@@ -3,14 +3,14 @@
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(untagged)]
 pub enum MachServiceEntry {
     Boolean(bool),
     Map(MachServiceOptions),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Hash)]
 #[serde(rename_all = "PascalCase")]
 pub struct MachServiceOptions {
     reset_at_close: Option<bool>,

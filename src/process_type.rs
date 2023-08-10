@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 
 // TryFrom<String> is needed due to https://github.com/serde-rs/serde/issues/1183
 // While still allowing the caller to use .with_process_type(ProcessType::Background)
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(try_from = "String")]
 pub enum ProcessType {
     Background,

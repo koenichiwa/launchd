@@ -58,21 +58,21 @@
 //! </plist>
 //! ```
 
+mod calendar_interval;
 mod error;
 mod keep_alive;
 mod mach_services;
 mod process_type;
 mod resource_limits;
 mod sockets;
-mod calendar_interval;
 
+pub use self::calendar_interval::CalendarInterval;
 pub use self::error::Error;
 pub use self::keep_alive::{KeepAliveOptions, KeepAliveType};
 pub use self::mach_services::{MachServiceEntry, MachServiceOptions};
 pub use self::process_type::ProcessType;
 pub use self::resource_limits::ResourceLimits;
 pub use self::sockets::{BonjourType, Socket, SocketOptions, Sockets};
-pub use self::calendar_interval::CalendarInterval;
 
 use plist::Value;
 use plist::{from_bytes, from_file, from_reader, from_reader_xml};
@@ -109,8 +109,9 @@ use std::path::Path;
 ///
 /// NB: The usage is still subject to change.
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
-// TODO: remove owned Strings (?)
-#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
+
+// Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Display, Default
+#[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "PascalCase")]
 pub struct Launchd {
@@ -193,7 +194,6 @@ type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
 ///     Ok(())
 /// }
 /// ```
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InetdCompatibility {
