@@ -50,9 +50,6 @@ launchd = {version = "0.3.0", features=["cron"]}
 ``` toml
 launchd = {version = "0.3.0", default-features = false, features=["serde"]}
 ```
-| :exclamation:   In the current version the variable `Launchd.launch_events` does not play well with this combination.   |
-|-----------------------------------------|
-
 
 ## Example
 
