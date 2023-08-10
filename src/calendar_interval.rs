@@ -159,9 +159,10 @@ impl CalendarInterval {
 #[cfg(test)]
 mod test {
     use super::CalendarInterval;
+    use super::Error;
 
     #[test]
-    fn create_valid_calendar_interval() {
+    fn create_valid_calendar_interval() -> Result<(), Error> {
         let check = CalendarInterval {
             minute: Some(5),
             hour: Some(5),
@@ -171,20 +172,21 @@ mod test {
         };
 
         let test = CalendarInterval::default()
-            .with_day(5)
-            .and_then(|ci| ci.with_minute(5))
-            .and_then(|ci| ci.with_hour(5))
-            .and_then(|ci| ci.with_weekday(5))
-            .and_then(|ci| ci.with_month(5));
+            .with_day(5)?
+            .with_minute(5)?
+            .with_hour(5)?
+            .with_weekday(5)?
+            .with_month(5)?;
 
-        assert!(test.is_ok());
-        assert_eq!(test.unwrap(), check);
+        assert_eq!(test, check);
+        Ok(())
     }
 
     #[test]
     fn create_invalid_calendar_interval() {
+        let exp_value = 32;
         let test = CalendarInterval::default()
-            .with_day(32)
+            .with_day(exp_value)
             .and_then(|ci| ci.with_minute(5))
             .and_then(|ci| ci.with_hour(5))
             .and_then(|ci| ci.with_weekday(5))
