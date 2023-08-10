@@ -1,11 +1,11 @@
 // See the KeepAlive section in https://www.manpagez.com/man/5/launchd.plist/
 //
-#[cfg(feature = "serde")]
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
+#[derive(Deserialize, Serialize)]
+#[serde(untagged)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KeepAliveType {
     Enabled(bool),
@@ -24,8 +24,8 @@ impl From<KeepAliveOptions> for KeepAliveType {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct KeepAliveOptions {
     successful_exit: Option<bool>,

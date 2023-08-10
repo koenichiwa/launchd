@@ -2,14 +2,14 @@
 //
 
 use crate::error::Error;
-#[cfg(feature = "serde")]
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::Path;
 
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
+#[derive(Deserialize, Serialize)]
+#[serde(untagged)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Sockets {
     Dictionary(HashMap<String, SocketOptions>),
@@ -22,7 +22,7 @@ impl From<Socket> for Sockets {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Serialize, Deserialize)]
 #[derive(Debug, PartialEq)]
 pub struct Socket {
     values: HashMap<String, SocketOptions>,
@@ -44,8 +44,8 @@ impl Socket {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(deny_unknown_fields))]
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 #[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SocketOptions {
@@ -62,8 +62,8 @@ pub struct SocketOptions {
     multicast_group: Option<String>,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketType {
     Dgram,
@@ -71,14 +71,14 @@ pub enum SocketType {
     Seqpacket,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "UPPERCASE"))]
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "UPPERCASE")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketProtocol {
     Tcp,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketFamily {
     IPv4,
@@ -156,8 +156,8 @@ impl SocketOptions {
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BonjourType {
     Boolean(bool),
