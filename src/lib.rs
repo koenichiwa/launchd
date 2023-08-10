@@ -77,8 +77,8 @@ use cron::{Schedule, TimeUnitSpec};
 use plist::Value;
 use plist::{from_bytes, from_file, from_reader, from_reader_xml};
 use plist::{to_file_binary, to_file_xml, to_writer_binary, to_writer_xml};
-
 use serde::{Deserialize, Serialize};
+
 use std::collections::HashMap;
 #[cfg(feature = "cron")]
 use std::convert::TryInto;
@@ -614,9 +614,7 @@ impl Launchd {
     pub fn session_create(self) -> Self {
         self.with_session_create(true)
     }
-}
 
-impl Launchd {
     // Write --
     pub fn to_writer_xml<W: Write>(&self, writer: W) -> Result<(), Error> {
         to_writer_xml(writer, self).map_err(Error::Write)
