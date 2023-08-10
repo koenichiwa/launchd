@@ -3,9 +3,8 @@
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct ResourceLimits {
     core: Option<u64>,
     #[serde(rename = "CPU")]

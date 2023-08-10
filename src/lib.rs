@@ -116,10 +116,9 @@ use std::path::Path;
 /// NB: The usage is still subject to change.
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
 // TODO: remove owned Strings (?)
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "PascalCase")]
-#[derive(Debug, Default, PartialEq)]
 pub struct Launchd {
     label: String,
     disabled: Option<bool>,
@@ -200,9 +199,8 @@ type LaunchEvents = HashMap<String, HashMap<String, HashMap<String, Value>>>;
 ///     Ok(())
 /// }
 /// ```
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Default)]
 #[serde(rename_all = "PascalCase")]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
 pub struct CalendarInterval {
     minute: Option<u8>,
     hour: Option<u8>,
@@ -217,9 +215,8 @@ pub enum InetdCompatibility {
 }
 
 // Move LoadSessionType to it's own module?
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LoadSessionType {
     BareString(String),
     Array(Vec<String>),

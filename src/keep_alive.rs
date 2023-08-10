@@ -4,9 +4,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KeepAliveType {
     Enabled(bool),
     Options(KeepAliveOptions),
@@ -24,9 +23,8 @@ impl From<KeepAliveOptions> for KeepAliveType {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 #[serde(rename_all = "PascalCase")]
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct KeepAliveOptions {
     successful_exit: Option<bool>,
     network_state: Option<bool>,

@@ -8,9 +8,8 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::Path;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Sockets {
     Dictionary(HashMap<String, SocketOptions>),
     Array(Vec<HashMap<String, SocketOptions>>),
@@ -43,10 +42,9 @@ impl Socket {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-#[cfg_attr(feature = "io", serde(rename_all = "PascalCase"))]
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
 pub struct SocketOptions {
     sock_type: Option<SocketType>,
     sock_passive: Option<bool>,
@@ -61,18 +59,16 @@ pub struct SocketOptions {
     multicast_group: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketType {
     Dgram,
     Stream,
     Seqpacket,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketProtocol {
     Tcp,
 }
@@ -154,9 +150,8 @@ impl SocketOptions {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BonjourType {
     Boolean(bool),
     String(String),
