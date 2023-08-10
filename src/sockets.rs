@@ -6,7 +6,7 @@ use crate::error::Error;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Deref;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
@@ -123,7 +123,7 @@ impl SocketOptions {
         let pathstr = name
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(name.as_ref())))?
             .to_owned();
         self.sock_path_name = Some(pathstr);
         Ok(self)

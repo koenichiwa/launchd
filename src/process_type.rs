@@ -1,4 +1,4 @@
-use crate::error::EnumDeserializationFromStrError;
+use crate::error::Error;
 
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -15,14 +15,14 @@ pub enum ProcessType {
 }
 
 impl TryFrom<String> for ProcessType {
-    type Error = EnumDeserializationFromStrError;
+    type Error = Error;
     fn try_from(s: String) -> Result<Self, Self::Error> {
         match s.as_str() {
             "Background" => Ok(ProcessType::Background),
             "Standard" => Ok(ProcessType::Standard),
             "Adaptive" => Ok(ProcessType::Adaptive),
             "Interactive" => Ok(ProcessType::Interactive),
-            _ => Err(EnumDeserializationFromStrError),
+            value => Err(Error::EnumDeserialization(value.to_owned())),
         }
     }
 }

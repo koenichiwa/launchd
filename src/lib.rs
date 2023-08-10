@@ -81,7 +81,7 @@ use serde::{Deserialize, Serialize};
 
 use std::collections::HashMap;
 use std::io::{Read, Seek, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Representation of a launchd.plist file.
 /// The definition of which can be found [here](https://www.manpagez.com/man/5/launchd.plist/).
@@ -238,7 +238,7 @@ impl Launchd {
         let pathstr = program
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(program.as_ref())))?
             .to_owned();
         Ok(Launchd {
             label: String::from(label.as_ref()),
@@ -275,7 +275,7 @@ impl Launchd {
         let pathstr = program
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(program.as_ref())))?
             .to_owned();
         self.program = Some(pathstr);
         Ok(self)
@@ -462,7 +462,7 @@ impl Launchd {
         let pathstr = path
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(path.as_ref())))?
             .to_owned();
         self.root_directory = Some(pathstr);
         Ok(self)
@@ -472,7 +472,7 @@ impl Launchd {
         let pathstr = path
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(path.as_ref())))?
             .to_owned();
         self.standard_error_path = Some(pathstr);
         Ok(self)
@@ -482,7 +482,7 @@ impl Launchd {
         let pathstr = path
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(path.as_ref())))?
             .to_owned();
         self.standard_in_path = Some(pathstr);
         Ok(self)
@@ -492,7 +492,7 @@ impl Launchd {
         let pathstr = path
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(path.as_ref())))?
             .to_owned();
         self.standard_out_path = Some(pathstr);
         Ok(self)
@@ -535,7 +535,7 @@ impl Launchd {
         let pathstr = path
             .as_ref()
             .to_str()
-            .ok_or(Error::PathConversion)?
+            .ok_or(Error::PathConversion(PathBuf::from(path.as_ref())))?
             .to_owned();
         self.working_directory = Some(pathstr);
         Ok(self)
