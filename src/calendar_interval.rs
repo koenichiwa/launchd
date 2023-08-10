@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-// bla
 
 #[cfg(feature = "cron")]
 use cron::{Schedule, TimeUnitSpec};
