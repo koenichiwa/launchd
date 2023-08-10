@@ -611,7 +611,11 @@ mod tests {
 
     macro_rules! test_case {
         ($fname:expr) => {
-            PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/resources/", $fname))
+            PathBuf::from(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/resources/",
+                $fname
+            ))
             // PathBuf::from_iter([env!("CARGO_MANIFEST_DIR"),"/tests/resources/"])
         };
     }
@@ -680,7 +684,7 @@ mod tests {
 
     #[test]
     fn load_complex_launch_events_1_plist() {
-        eprintln!("{:?}",test_case!("launchevents-1.plist"));
+        eprintln!("{:?}", test_case!("launchevents-1.plist"));
         let test = Launchd::from_file(test_case!("launchevents-1.plist")).unwrap();
 
         match test.launch_events {
