@@ -2,9 +2,9 @@ name: Continuous integration
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, test/improve-ci ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,7 +13,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
     - name: Fmt
       run: cargo fmt --all --verbose -- --check
     - name: Clippy
@@ -22,7 +24,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
     - name: Install cargo-all-features
       run: cargo install cargo-all-features
     - name: Run tests
