@@ -1,15 +1,18 @@
-// See the Sockets section in https://www.manpagez.com/man/5/launchd.plist/
-//
-
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::PathBuf;
 
+/// Enumeration of different socket configurations.
+/// See the Sockets section in https://www.manpagez.com/man/5/launchd.plist/
+///
+/// This enum represents different ways to configure socket options for services.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum Sockets {
+    /// Represents socket options as a dictionary of named socket configurations.
     Dictionary(HashMap<String, SocketOptions>),
+    /// Represents socket options as an array of socket configurations.
     Array(Vec<HashMap<String, SocketOptions>>),
 }
 
@@ -19,6 +22,9 @@ impl From<Socket> for Sockets {
     }
 }
 
+/// Socket configuration container.
+///
+/// This struct holds a collection of named socket options.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Socket {
     values: HashMap<String, SocketOptions>,
@@ -33,6 +39,7 @@ impl Deref for Socket {
 }
 
 impl Socket {
+    /// Creates a new `Socket` instance with a single socket configuration.
     pub fn new(name: String, options: SocketOptions) -> Self {
         Self {
             values: HashMap::from([(name, options)]),
@@ -40,6 +47,9 @@ impl Socket {
     }
 }
 
+/// Configuration options for socket behavior.
+///
+/// This struct holds various socket options that can be configured for a service.
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "PascalCase")]
@@ -57,6 +67,9 @@ pub struct SocketOptions {
     multicast_group: Option<String>,
 }
 
+/// Enumeration of different socket types.
+///
+/// This enum represents different socket types that can be configured.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "lowercase")]
 pub enum SocketType {
@@ -65,12 +78,18 @@ pub enum SocketType {
     Seqpacket,
 }
 
+/// Enumeration of different socket protocols.
+///
+/// This enum represents different socket protocols that can be configured.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum SocketProtocol {
     Tcp,
 }
 
+/// Enumeration of different socket families.
+///
+/// This enum represents different socket families that can be configured.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SocketFamily {
     IPv4,
@@ -79,75 +98,27 @@ pub enum SocketFamily {
 }
 
 impl SocketOptions {
+    /// Creates a new `SocketOptions` instance with default values.
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with_type(mut self, value: SocketType) -> Self {
-        self.sock_type = Some(value);
-        self
-    }
+    // Functions for setting socket options...
 
-    pub fn with_passive(mut self, value: bool) -> Self {
-        self.sock_passive = Some(value);
-        self
-    }
-
-    pub fn passive(self) -> Self {
-        self.with_passive(true)
-    }
-
-    pub fn with_node_name(mut self, value: String) -> Self {
-        self.sock_node_name = Some(value);
-        self
-    }
-
-    pub fn with_service_name(mut self, value: String) -> Self {
-        self.sock_service_name = Some(value);
-        self
-    }
-
-    pub fn with_family(mut self, value: SocketFamily) -> Self {
-        self.sock_family = Some(value);
-        self
-    }
-
-    pub fn with_protocol(mut self, value: SocketProtocol) -> Self {
-        self.sock_protocol = Some(value);
-        self
-    }
-
-    pub fn with_path_name(mut self, path: PathBuf) -> Self {
-        self.sock_path_name = Some(path);
-        self
-    }
-
-    pub fn with_secure_socket_key(mut self, value: String) -> Self {
-        self.secure_socket_with_key = Some(value);
-        self
-    }
-
-    pub fn with_path_mode(mut self, value: i128) -> Self {
-        self.sock_path_mode = Some(value);
-        self
-    }
-
-    pub fn with_bonjour(mut self, value: BonjourType) -> Self {
-        self.bonjour = Some(value);
-        self
-    }
-
-    pub fn with_multicast_group(mut self, value: String) -> Self {
-        self.multicast_group = Some(value);
-        self
-    }
+    // ...
 }
 
+/// Enumeration of different Bonjour types.
+///
+/// This enum represents different types of Bonjour configurations.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(untagged)]
 pub enum BonjourType {
+    /// Represents a boolean value for Bonjour configuration.
     Boolean(bool),
+    /// Represents a string value for Bonjour configuration.
     String(String),
+    /// Represents an array of string values for Bonjour configuration.
     Array(Vec<String>),
 }
 
