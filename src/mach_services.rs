@@ -12,14 +12,18 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```rust
-/// use launchd::MachServiceEntry;
+/// use std::collections::HashMap;
+/// use launchd::{Launchd, MachServiceEntry, MachServiceOptions};
 ///
-/// let mach_service_bool = MachServiceEntry::Boolean(true);
-/// let mach_service_options = MachServiceEntry::Map(MachServiceOptions.new()
-///     .with_name("com.example.my_service".to_string())
-///     .with_reset_at_close(true)
-///     .with_hide_until_check_in(false)
-/// });
+/// fn main() {
+///     let mut mach_services = HashMap::<String, MachServiceEntry>::default();
+///     mach_services.insert("com.example.my_service".to_string(), true.into());
+///     mach_services.insert("com.example.my_other_service".to_string(), MachServiceOptions::new()
+///             .reset_at_close()
+///             .with_hide_until_check_in(false)
+///             .into());
+///     let launchd = Launchd::default().with_mach_services(mach_services);
+/// }
 /// ```
 ///
 /// See the MachServices section in [launchd.plist(5)](https://www.manpagez.com/man/5/launchd.plist/) for more information.
