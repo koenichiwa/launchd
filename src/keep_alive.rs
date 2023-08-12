@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Enumeration of different types of keep-alive configurations.
-/// 
+///
 /// See the KeepAlive section in <https://www.manpagez.com/man/5/launchd.plist/>
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
