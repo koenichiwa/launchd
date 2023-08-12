@@ -24,13 +24,13 @@ impl ResourceLimits {
         Self::default()
     }
 
-    /// Sets the resource limit for core dump file size.
+    /// Sets the resource limit for core file size in bytes.
     pub fn with_core(mut self, value: u64) -> Self {
         self.core = Some(value);
         self
     }
 
-    /// Sets the resource limit for CPU usage time.
+    /// Sets the resource limit for CPU usage time in seconds.
     pub fn with_cpu(mut self, value: u64) -> Self {
         self.cpu = Some(value);
         self
@@ -42,13 +42,13 @@ impl ResourceLimits {
         self
     }
 
-    /// Sets the resource limit for maximum file size.
+    /// Sets the resource limit for maximum file size in bytes.
     pub fn with_file_size(mut self, value: u64) -> Self {
         self.file_size = Some(value);
         self
     }
 
-    /// Sets the resource limit for locked memory size.
+    /// Sets the resource limit for locked memory size in bytes.
     pub fn with_memory_lock(mut self, value: u64) -> Self {
         self.memory_lock = Some(value);
         self
@@ -66,13 +66,13 @@ impl ResourceLimits {
         self
     }
 
-    /// Sets the resource limit for resident set size.
+    /// Sets the resource limit for resident set size in bytes.
     pub fn with_resident_set_size(mut self, value: u64) -> Self {
         self.resident_set_size = Some(value);
         self
     }
 
-    /// Sets the resource limit for stack size.
+    /// Sets the resource limit for stack size in bytes.
     pub fn with_stack(mut self, value: u64) -> Self {
         self.stack = Some(value);
         self
