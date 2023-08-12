@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 /// Configuration options for resource limits.
-/// See the HardResourceLimits / SoftResourceLimits section of https://www.manpagez.com/man/5/launchd.plist/
-///
-/// This struct holds various resource limits that can be configured for a service.
+/// 
+/// See the HardResourceLimits / SoftResourceLimits section of <https://www.manpagez.com/man/5/launchd.plist/>
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(rename_all = "PascalCase")]
 pub struct ResourceLimits {

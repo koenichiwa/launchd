@@ -4,9 +4,8 @@ use std::ops::Deref;
 use std::path::PathBuf;
 
 /// Enumeration of different socket configurations.
-/// See the Sockets section in https://www.manpagez.com/man/5/launchd.plist/
-///
-/// This enum represents different ways to configure socket options for services.
+/// 
+/// See the Sockets section in <https://www.manpagez.com/man/5/launchd.plist/>
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum Sockets {
