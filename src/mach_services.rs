@@ -1,8 +1,28 @@
 use serde::{Deserialize, Serialize};
 
 /// Enumeration of different types of Mach service entries.
-/// 
-/// See the MachServices section in <https://www.manpagez.com/man/5/launchd.plist/>
+///
+/// A `MachServiceEntry` represents the configuration for a Mach service within a `launchd.plist` file.
+/// A Mach service is a type of inter-process communication (IPC) mechanism used in macOS and other Unix-like systems.
+/// Mach services allow processes to communicate and share resources across different tasks in a secure and controlled manner.
+///
+/// In the context of `launchd.plist` files, a Mach service entry can be specified with different options, such as
+/// enabling or disabling the service, setting up authorization rights, and more.
+///
+/// # Examples
+///
+/// ```rust
+/// use launchd::MachServiceEntry;
+///
+/// let mach_service_bool = MachServiceEntry::Boolean(true);
+/// let mach_service_options = MachServiceEntry::Map(MachServiceOptions.new()
+///     .with_name("com.example.my_service".to_string())
+///     .with_reset_at_close(true)
+///     .with_hide_until_check_in(false)
+/// });
+/// ```
+///
+/// See the MachServices section in [launchd.plist(5)](https://www.manpagez.com/man/5/launchd.plist/) for more information.
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(untagged)]
 pub enum MachServiceEntry {
