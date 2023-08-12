@@ -1,63 +1,5 @@
 #![warn(missing_docs)]
-//! A Rust library for creating and parsing Launchd files.
-//!
-//! It's still in early development and all help is welcome.
-//!
-//! ## Example
-//!
-//! ``` rust
-//! use launchd::{CalendarInterval, Error, Launchd};
-//!
-//! fn main() -> Result<(), Error> {
-//!     let ci = CalendarInterval::default()
-//!         .with_hour(12)?
-//!         .with_minute(10)?
-//!         .with_weekday(7)?;
-//!
-//!     let launchd = Launchd::new("LABEL".to_string(), "./foo/bar.txt".into())
-//!             .with_user_name("Henk".to_string())
-//!             .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
-//!             .with_start_calendar_intervals(vec![ci])
-//!             .disabled();
-//!
-//!     return launchd.to_writer_xml(std::io::stdout());
-//! }
-//! ```
-//!
-//! Results in:
-//!
-//! ``` xml
-//! <?xml version="1.0" encoding="UTF-8"?>
-//! <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-//! <plist version="1.0">
-//! <dict>
-//!         <key>Label</key>
-//!         <string>LABEL</string>
-//!         <key>Disabled</key>
-//!         <true />
-//!         <key>UserName</key>
-//!         <string>Henk</string>
-//!         <key>Program</key>
-//!         <string>./foo/bar.txt</string>
-//!         <key>ProgramArguments</key>
-//!         <array>
-//!                 <string>Hello</string>
-//!                 <string>World!</string>
-//!         </array>
-//!         <key>StartCalendarIntervals</key>
-//!         <array>
-//!                 <dict>
-//!                         <key>Minute</key>
-//!                         <integer>10</integer>
-//!                         <key>Hour</key>
-//!                         <integer>12</integer>
-//!                         <key>Weekday</key>
-//!                         <integer>7</integer>
-//!                 </dict>
-//!         </array>
-//! </dict>
-//! </plist>
-//! ```
+#![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
 
 mod calendar_interval;
 mod error;
@@ -96,7 +38,7 @@ use std::path::PathBuf;
 /// use std::path::Path;
 ///
 /// fn example() -> Result<Launchd, Error> {
-///     Ok(Launchd::new("LABEL".to_string(), "./foo/bar.txt".into())
+///     Ok(Launchd::new("My_Label".to_string(), "./foo/bar.txt".into())
 ///         .with_user_name("Henk".to_string())
 ///         .with_program_arguments(vec!["Hello".to_string(), "World!".to_string()])
 ///         .with_start_calendar_intervals(vec![CalendarInterval::default().with_hour(12)?])
@@ -108,13 +50,12 @@ use std::path::PathBuf;
 /// let launchd = example();
 ///
 /// ```
-/// This will create a launchd representation with the label "LABEL", running "./foo/bar.txt"
-/// with the args "Hello" and "World!", for the user "Henk", each day at 12.
+/// This will create a launchd representation with the label "My_Label", running "./foo/bar.txt"
+/// with the args "Hello" and "World!", for the user "Henk", each day at 12, but its disabled.
 ///
-/// NB: The usage is still subject to change.
+
 // TODO: Fill with all options in https://www.manpagez.com/man/5/launchd.plist/
 
-// Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Display, Default
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "PascalCase")]
