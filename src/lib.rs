@@ -249,59 +249,59 @@ impl Launchd {
         self
     }
 
-    /// Sets the bundle_program variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `bundle_program` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_bundle_program(mut self, bundle: String) -> Self {
         self.bundle_program = Some(bundle);
         self
     }
 
-    /// Sets the program_arguments variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `program_arguments` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_program_arguments(mut self, program_arguments: Vec<String>) -> Self {
         self.program_arguments = Some(program_arguments);
         self
     }
 
-    /// Sets the run_at_load variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `run_at_load` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_run_at_load(mut self, run_at_load: bool) -> Self {
         self.run_at_load = Some(run_at_load);
         self
     }
 
-    /// Sets the run_at_load variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `run_at_load` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn run_at_load(self) -> Self {
         self.with_run_at_load(true)
     }
 
-    /// Sets the queue_directories variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `queue_directories` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_queue_directories(mut self, queue_directories: Vec<String>) -> Self {
         self.queue_directories = Some(queue_directories);
         self
     }
 
-    /// Sets the watch_paths variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `watch_paths` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_watch_paths(mut self, watch_paths: Vec<String>) -> Self {
         self.watch_paths = Some(watch_paths);
         self
     }
 
-    /// Sets the start_on_mount variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `start_on_mount` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_start_on_mount(mut self, start_on_mount: bool) -> Self {
         self.start_on_mount = Some(start_on_mount);
         self
     }
 
-    /// Sets the start_on_mount variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `start_on_mount` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn start_on_mount(self) -> Self {
         self.with_start_on_mount(true)
     }
 
-    /// Sets the start_interval variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `start_interval` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_start_interval(mut self, start_interval: u32) -> Self {
         self.start_interval = Some(start_interval);
         self
     }
 
-    /// Sets the start_calendar_intervals variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `start_calendar_intervals` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_start_calendar_intervals(
         mut self,
         start_calendar_intervals: Vec<CalendarInterval>,
@@ -310,13 +310,13 @@ impl Launchd {
         self
     }
 
-    /// Sets the abandon_process_group variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `abandon_process_group` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_abandon_process_group(mut self, value: bool) -> Self {
         self.abandon_process_group = Some(value);
         self
     }
 
-    /// Sets the abandon_process_group variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `abandon_process_group` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn abandon_process_group(self) -> Self {
         self.with_abandon_process_group(true)
     }
@@ -332,126 +332,126 @@ impl Launchd {
         self.with_debug(true)
     }
 
-    /// Sets the enable_globbing variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `enable_globbing` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_enable_globbing(mut self, value: bool) -> Self {
         self.enable_globbing = Some(value);
         self
     }
 
-    /// Sets the enable_globbing variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `enable_globbing` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn enable_globbing(self) -> Self {
         self.with_enable_globbing(true)
     }
 
-    /// Sets the enable_transactions variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `enable_transactions` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_enable_transactions(mut self, value: bool) -> Self {
         self.enable_transactions = Some(value);
         self
     }
 
-    /// Sets the enable_transactions variable to true for the `Launchd` instance and returns the modified instance.
+    /// Sets the `enable_transactions` variable to true for the `Launchd` instance and returns the modified instance.
     pub fn enable_transactions(self) -> Self {
         self.with_enable_transactions(true)
     }
 
-    /// Sets the enable_pressured_exit variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `enable_pressured_exit` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_enable_pressured_exit(mut self, value: bool) -> Self {
         self.enable_pressured_exit = Some(value);
         self
     }
 
-    /// Sets the enable_pressured_exit variable to true for the `Launchd` instance and returns the modified instance.
+    /// Sets the `enable_pressured_exit` variable to true for the `Launchd` instance and returns the modified instance.
     pub fn enable_pressured_exit(self) -> Self {
         self.with_enable_pressured_exit(true)
     }
 
-    /// Sets the environment_variables variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `environment_variables` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_environment_variables(mut self, env: HashMap<String, String>) -> Self {
         self.environment_variables = Some(env);
         self
     }
 
-    /// Sets the exit_timeout variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `exit_timeout` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_exit_timeout(mut self, timeout: u32) -> Self {
         self.exit_time_out = Some(timeout);
         self
     }
 
-    /// Sets the init_groups variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `init_groups` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_init_groups(mut self, value: bool) -> Self {
         self.init_groups = Some(value);
         self
     }
 
-    /// Sets the init_groups variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `init_groups` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn init_groups(self) -> Self {
         self.with_init_groups(true)
     }
 
-    /// Sets the launch_only_once variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `launch_only_once` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_launch_only_once(mut self, value: bool) -> Self {
         self.launch_only_once = Some(value);
         self
     }
 
-    /// Sets the launch_only_once variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `launch_only_once` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn launch_only_once(self) -> Self {
         self.with_launch_only_once(true)
     }
 
-    /// Sets the limit_load_from_hosts variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `limit_load_from_hosts` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_limit_load_from_hosts(mut self, value: Vec<String>) -> Self {
         self.limit_load_from_hosts = Some(value);
         self
     }
 
-    /// Sets the limit_to_from_hosts variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `limit_to_from_hosts` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_limit_to_from_hosts(mut self, value: Vec<String>) -> Self {
         self.limit_load_to_hosts = Some(value);
         self
     }
 
-    /// Sets the limit_load_to_session_type variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `limit_load_to_session_type` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_limit_load_to_session_type(mut self, value: LoadSessionType) -> Self {
         self.limit_load_to_session_type = Some(value);
         self
     }
 
-    /// Sets the limit_load_to_hardware variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `limit_load_to_hardware` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_limit_load_to_hardware(mut self, value: HashMap<String, Vec<String>>) -> Self {
         self.limit_load_to_hardware = Some(value);
         self
     }
 
-    /// Sets the limit_load_from_hardware variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `limit_load_from_hardware` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_limit_load_from_hardware(mut self, value: HashMap<String, Vec<String>>) -> Self {
         self.limit_load_from_hardware = Some(value);
         self
     }
 
-    /// Sets the low_priority_io variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `low_priority_io` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_low_priority_io(mut self, value: bool) -> Self {
         self.low_priority_io = Some(value);
         self
     }
 
-    /// Sets the low_priority_io variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `low_priority_io` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn low_priority_io(self) -> Self {
         self.with_low_priority_io(true)
     }
 
-    /// Sets the low_priority_background_io variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `low_priority_background_io` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_low_priority_background_io(mut self, value: bool) -> Self {
         self.low_priority_background_io = Some(value);
         self
     }
 
-    /// Sets the low_priority_background_io variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `low_priority_background_io` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn low_priority_background_io(self) -> Self {
         self.with_low_priority_background_io(true)
     }
 
-    /// Sets the mach_services variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `mach_services` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_mach_services(mut self, services: HashMap<String, MachServiceEntry>) -> Self {
         self.mach_services = Some(services);
         self
@@ -463,31 +463,31 @@ impl Launchd {
         self
     }
 
-    /// Sets the root_directory variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `root_directory` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_root_directory(mut self, path: PathBuf) -> Self {
         self.root_directory = Some(path);
         self
     }
 
-    /// Sets the standard_error_path variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `standard_error_path` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_standard_error_path(mut self, path: PathBuf) -> Self {
         self.standard_error_path = Some(path);
         self
     }
 
-    /// Sets the standard_in_path variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `standard_in_path` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_standard_in_path(mut self, path: PathBuf) -> Self {
         self.standard_in_path = Some(path);
         self
     }
 
-    /// Sets the standard_out_path variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `standard_out_path` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_standard_out_path(mut self, path: PathBuf) -> Self {
         self.standard_out_path = Some(path);
         self
     }
 
-    /// Sets the throttle_interval variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `throttle_interval` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_throttle_interval(mut self, value: u32) -> Self {
         self.throttle_interval = Some(value);
         self
@@ -505,59 +505,59 @@ impl Launchd {
         self
     }
 
-    /// Sets the wait_for_debugger variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `wait_for_debugger` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_wait_for_debugger(mut self, value: bool) -> Self {
         self.wait_for_debugger = Some(value);
         self
     }
 
-    /// Sets the wait_for_debugger variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `wait_for_debugger` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn wait_for_debugger(self) -> Self {
         self.with_wait_for_debugger(true)
     }
 
-    /// Sets the materialize_dataless_files variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `materialize_dataless_files` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_materialize_dataless_files(mut self, value: bool) -> Self {
         self.materialize_dataless_files = Some(value);
         self
     }
 
-    /// Sets the materialize_dataless_files variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `materialize_dataless_files` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn materialize_dataless_files(self) -> Self {
         self.with_materialize_dataless_files(true)
     }
 
-    /// Sets the working_directory variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `working_directory` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_working_directory(mut self, path: PathBuf) -> Self {
         self.working_directory = Some(path);
         self
     }
 
-    /// Sets the inetd_compatibility variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `inetd_compatibility` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_inetd_compatibility(mut self, wait: bool) -> Self {
         self.inetd_compatibility = Some(HashMap::from([(InetdCompatibility::Wait, wait)]));
         self
     }
 
-    /// Sets the keep_alive variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `keep_alive` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_keep_alive(mut self, keep_alive: KeepAliveType) -> Self {
         self.keep_alive = Some(keep_alive);
         self
     }
 
-    /// Sets the process_type variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `process_type` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_process_type(mut self, process_type: ProcessType) -> Self {
         self.process_type = Some(process_type);
         self
     }
 
-    /// Sets the hard_resource_limits variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `hard_resource_limits` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_hard_resource_limits(mut self, limits: ResourceLimits) -> Self {
         self.hard_resource_limits = Some(limits);
         self
     }
 
-    /// Sets the soft_resource_limits variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `soft_resource_limits` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_soft_resource_limits(mut self, limits: ResourceLimits) -> Self {
         self.soft_resource_limits = Some(limits);
         self
@@ -576,7 +576,7 @@ impl Launchd {
                     self.sockets = Some(Sockets::Array(arr));
                 }
                 (Sockets::Dictionary(dict), Sockets::Dictionary(new_dict)) => {
-                    self.sockets = Some(Sockets::Array(vec![dict, new_dict]))
+                    self.sockets = Some(Sockets::Array(vec![dict, new_dict]));
                 }
                 (Sockets::Dictionary(dict), Sockets::Array(mut new_arr)) => {
                     new_arr.insert(0, dict);
@@ -589,19 +589,19 @@ impl Launchd {
         self
     }
 
-    /// Sets the launch_events variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `launch_events` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_launch_events(mut self, value: LaunchEvents) -> Self {
         self.launch_events = Some(value);
         self
     }
 
-    /// Sets the session_create variable for the `Launchd` instance and returns the modified instance.
+    /// Sets the `session_create` variable for the `Launchd` instance and returns the modified instance.
     pub fn with_session_create(mut self, value: bool) -> Self {
         self.session_create = Some(value);
         self
     }
 
-    /// Sets the session_create variable for the `Launchd` instance to true and returns the modified instance.
+    /// Sets the `session_create` variable for the `Launchd` instance to true and returns the modified instance.
     pub fn session_create(self) -> Self {
         self.with_session_create(true)
     }

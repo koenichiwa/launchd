@@ -7,6 +7,7 @@ repository = "https://github.com/koenichiwa/launchd"
 readme = "README.md"
 description = "Rust library for creating and parsing launchd files"
 keywords = ["launchd", "schedule", "repeat", "periodic", "macOS"]
+categories = ["Configuration"]
 license = "MIT"
 
 [package.metadata.cargo-all-features]
